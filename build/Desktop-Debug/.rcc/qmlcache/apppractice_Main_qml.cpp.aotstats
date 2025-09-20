@@ -1,0 +1,36 @@
+[
+    {
+        "moduleFiles": [
+            {
+                "entries": [
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 26,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on fill.",
+                        "functionName": "fill",
+                        "line": 16
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 26,
+                        "durationMicroseconds": 4482,
+                        "errorMessage": "Cannot generate efficient code for script lookup",
+                        "functionName": "appsdata",
+                        "line": 18
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 27,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type StackView for binding on stackView.",
+                        "functionName": "stackView",
+                        "line": 19
+                    }
+                ],
+                "filepath": "/home/anujs/practice/Main.qml"
+            }
+        ],
+        "moduleId": "practice(apppractice)"
+    }
+]

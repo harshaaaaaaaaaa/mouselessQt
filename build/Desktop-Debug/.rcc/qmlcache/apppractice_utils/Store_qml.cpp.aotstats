@@ -1,0 +1,116 @@
+[
+    {
+        "moduleFiles": [
+            {
+                "entries": [
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 615,
+                        "errorMessage": "",
+                        "functionName": "activeKeys",
+                        "line": 8
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 36,
+                        "durationMicroseconds": 137,
+                        "errorMessage": "Cannot generate efficient code for storing an array in a non-sequence type",
+                        "functionName": "expectedSequence",
+                        "line": 9
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 29,
+                        "durationMicroseconds": 108,
+                        "errorMessage": "Cannot generate efficient code for storing an array in a non-sequence type",
+                        "functionName": "keyColors",
+                        "line": 11
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 342,
+                        "errorMessage": "Cannot access value for name Fn",
+                        "functionName": "resetSequence",
+                        "line": 32
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "checkKeyPress",
+                        "line": 40
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "handleKeyPress",
+                        "line": 57
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "handleKeyRelease",
+                        "line": 102
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 137,
+                        "errorMessage": "Cannot access value for name Fn",
+                        "functionName": "skipRight",
+                        "line": 139
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 5,
+                        "durationMicroseconds": 919,
+                        "errorMessage": "",
+                        "functionName": "skipLeft",
+                        "line": 145
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 134,
+                        "errorMessage": "Cannot access value for name Fn",
+                        "functionName": "advanceShortcut",
+                        "line": 151
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "showResult",
+                        "line": 158
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 22,
+                        "durationMicroseconds": 110,
+                        "errorMessage": "method advanceShortcut cannot be resolved.",
+                        "functionName": "onTriggered",
+                        "line": 24
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 22,
+                        "durationMicroseconds": 40,
+                        "errorMessage": "Cannot find name resultOpacity",
+                        "functionName": "onTriggered",
+                        "line": 29
+                    }
+                ],
+                "filepath": "/home/anujs/practice/utils/Store.qml"
+            }
+        ],
+        "moduleId": "practice(apppractice)"
+    }
+]

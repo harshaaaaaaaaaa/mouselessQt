@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/qt/qml/practice">
+    <file alias="qmldir">/home/anujs/practice/build/Desktop-Debug/practice/qmldir</file>
+  </qresource>
+</RCC>
+

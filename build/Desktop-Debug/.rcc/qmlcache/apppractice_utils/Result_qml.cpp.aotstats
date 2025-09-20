@@ -1,0 +1,284 @@
+[
+    {
+        "moduleFiles": [
+            {
+                "entries": [
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 6,
+                        "durationMicroseconds": 174,
+                        "errorMessage": "Cannot load property length from (component in /home/anujs/practice/utils/Result.qml)::attemptedKeys with type QVariant.",
+                        "functionName": "updateKeyCounts",
+                        "line": 18
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 29,
+                        "durationMicroseconds": 175,
+                        "errorMessage": "",
+                        "functionName": "onAttemptedKeysChanged",
+                        "line": 30
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 20,
+                        "durationMicroseconds": 134,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 8
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 28,
+                        "durationMicroseconds": 132,
+                        "errorMessage": "",
+                        "functionName": "onCompleted",
+                        "line": 29
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 20,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on onClicked.",
+                        "functionName": "onClicked",
+                        "line": 38
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 22,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on top.",
+                        "functionName": "top",
+                        "line": 35
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on left.",
+                        "functionName": "left",
+                        "line": 36
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 20,
+                        "durationMicroseconds": 365,
+                        "errorMessage": "",
+                        "functionName": "spacing",
+                        "line": 43
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 23,
+                        "durationMicroseconds": 301,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 45
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 29,
+                        "durationMicroseconds": 331,
+                        "errorMessage": "",
+                        "functionName": "topMargin",
+                        "line": 46
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 35,
+                        "durationMicroseconds": 268,
+                        "errorMessage": "",
+                        "functionName": "horizontalCenter",
+                        "line": 47
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 129,
+                        "errorMessage": "Cannot access value for name correctkey",
+                        "functionName": "text",
+                        "line": 51
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 35,
+                        "durationMicroseconds": 140,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 63
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 27,
+                        "durationMicroseconds": 91,
+                        "errorMessage": "Cannot access value for name stackView",
+                        "functionName": "onClicked",
+                        "line": 72
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 160,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 71
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 28,
+                        "durationMicroseconds": 126,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 88
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 272,
+                        "errorMessage": "",
+                        "functionName": "fillColor",
+                        "line": 96
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 364,
+                        "errorMessage": "",
+                        "functionName": "centerX",
+                        "line": 100
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 317,
+                        "errorMessage": "",
+                        "functionName": "centerY",
+                        "line": 101
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 304,
+                        "errorMessage": "",
+                        "functionName": "radiusX",
+                        "line": 102
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 322,
+                        "errorMessage": "",
+                        "functionName": "radiusY",
+                        "line": 103
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 299,
+                        "errorMessage": "",
+                        "functionName": "sweepAngle",
+                        "line": 106
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 20,
+                        "durationMicroseconds": 708,
+                        "errorMessage": "Cannot generate efficient code for call to untyped JavaScript function",
+                        "functionName": "text",
+                        "line": 116
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 32,
+                        "durationMicroseconds": 142,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 110
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 26,
+                        "durationMicroseconds": 190,
+                        "errorMessage": "",
+                        "functionName": "weight",
+                        "line": 113
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 17,
+                        "durationMicroseconds": 284,
+                        "errorMessage": "",
+                        "functionName": "target",
+                        "line": 121
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 12,
+                        "durationMicroseconds": 76,
+                        "errorMessage": "Cannot access value for name correctkey",
+                        "functionName": "to",
+                        "line": 124
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 20,
+                        "durationMicroseconds": 344,
+                        "errorMessage": "",
+                        "functionName": "spacing",
+                        "line": 131
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 294,
+                        "errorMessage": "",
+                        "functionName": "bottom",
+                        "line": 133
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 31,
+                        "durationMicroseconds": 321,
+                        "errorMessage": "",
+                        "functionName": "bottomMargin",
+                        "line": 134
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 35,
+                        "durationMicroseconds": 266,
+                        "errorMessage": "",
+                        "functionName": "horizontalCenter",
+                        "line": 135
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 100,
+                        "errorMessage": "Cannot access value for name correctkey",
+                        "functionName": "text",
+                        "line": 139
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 75,
+                        "errorMessage": "Cannot access value for name wrongkey",
+                        "functionName": "text",
+                        "line": 146
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 21,
+                        "durationMicroseconds": 87,
+                        "errorMessage": "Cannot access value for name attemptedKeys",
+                        "functionName": "text",
+                        "line": 153
+                    }
+                ],
+                "filepath": "/home/anujs/practice/utils/Result.qml"
+            }
+        ],
+        "moduleId": "practice(apppractice)"
+    }
+]

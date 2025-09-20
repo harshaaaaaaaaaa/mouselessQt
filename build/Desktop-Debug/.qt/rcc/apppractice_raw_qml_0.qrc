@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="/qt/qml/practice/">
+    <file alias="Main.qml">/home/anujs/practice/Main.qml</file>
+    <file alias="keydata.js">/home/anujs/practice/keydata.js</file>
+    <file alias="utils/ShortcutView.qml">/home/anujs/practice/utils/ShortcutView.qml</file>
+    <file alias="utils/CategoryView.qml">/home/anujs/practice/utils/CategoryView.qml</file>
+    <file alias="utils/AppsView.qml">/home/anujs/practice/utils/AppsView.qml</file>
+    <file alias="utils/Testground.qml">/home/anujs/practice/utils/Testground.qml</file>
+    <file alias="vstestdata.js">/home/anujs/practice/vstestdata.js</file>
+    <file alias="utils/Result.qml">/home/anujs/practice/utils/Result.qml</file>
+    <file alias="utils/KeyAnalysis.qml">/home/anujs/practice/utils/KeyAnalysis.qml</file>
+    <file alias="Resource.qrc">/home/anujs/practice/Resource.qrc</file>
+  </qresource>
+</RCC>
+

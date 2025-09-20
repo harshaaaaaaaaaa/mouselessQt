@@ -1,0 +1,12 @@
+-I
+/home/anujs/practice/build/Desktop-Debug
+-I
+/usr/lib/qt6/qml
+--resource
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/qmake_practice.qrc
+--resource
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/apppractice_raw_qml_0.qrc
+--resource
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/apppractice_raw_qml_0_extra_qmldirs.qrc
+--module
+practice

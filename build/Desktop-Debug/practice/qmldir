@@ -1,0 +1,11 @@
+module practice
+typeinfo apppractice.qmltypes
+prefer :/qt/qml/practice/
+Main 1.0 Main.qml
+ShortcutView 1.0 utils/ShortcutView.qml
+CategoryView 1.0 utils/CategoryView.qml
+AppsView 1.0 utils/AppsView.qml
+Testground 1.0 utils/Testground.qml
+Result 1.0 utils/Result.qml
+KeyAnalysis 1.0 utils/KeyAnalysis.qml
+

@@ -1,0 +1,164 @@
+[
+    {
+        "moduleFiles": [
+            {
+                "entries": [
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 19,
+                        "durationMicroseconds": 216,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 7
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 28,
+                        "durationMicroseconds": 112,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 16
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 23,
+                        "durationMicroseconds": 221,
+                        "errorMessage": "",
+                        "functionName": "left",
+                        "line": 18
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 29,
+                        "durationMicroseconds": 238,
+                        "errorMessage": "",
+                        "functionName": "leftMargin",
+                        "line": 19
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 24,
+                        "durationMicroseconds": 50,
+                        "errorMessage": "Cannot access value for name appsdata",
+                        "functionName": "model",
+                        "line": 23
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 31,
+                        "durationMicroseconds": 280,
+                        "errorMessage": "Cannot access value for name modelData",
+                        "functionName": "appTitle",
+                        "line": 25
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 30,
+                        "durationMicroseconds": 221,
+                        "errorMessage": "Cannot access value for name modelData",
+                        "functionName": "appIcon",
+                        "line": 26
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 44,
+                        "durationMicroseconds": 259,
+                        "errorMessage": "",
+                        "functionName": "preferredWidth",
+                        "line": 27
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 45,
+                        "durationMicroseconds": 344,
+                        "errorMessage": "",
+                        "functionName": "preferredHeight",
+                        "line": 28
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 184,
+                        "errorMessage": "",
+                        "functionName": "source",
+                        "line": 45
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 24,
+                        "durationMicroseconds": 221,
+                        "errorMessage": "",
+                        "functionName": "width",
+                        "line": 46
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 215,
+                        "errorMessage": "",
+                        "functionName": "height",
+                        "line": 47
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 31,
+                        "durationMicroseconds": 213,
+                        "errorMessage": "",
+                        "functionName": "left",
+                        "line": 49
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 190,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 51
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 23,
+                        "durationMicroseconds": 127,
+                        "errorMessage": "",
+                        "functionName": "text",
+                        "line": 57
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 188,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 61
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 31,
+                        "durationMicroseconds": 184,
+                        "errorMessage": "",
+                        "functionName": "left",
+                        "line": 63
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 24,
+                        "durationMicroseconds": 77,
+                        "errorMessage": "Cannot access value for name stackView",
+                        "functionName": "onClicked",
+                        "line": 70
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 102,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 69
+                    }
+                ],
+                "filepath": "/home/anujs/practice/utils/AppsView.qml"
+            }
+        ],
+        "moduleId": "practice(apppractice)"
+    }
+]

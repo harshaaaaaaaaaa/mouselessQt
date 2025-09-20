@@ -1,0 +1,444 @@
+[
+    {
+        "moduleFiles": [
+            {
+                "entries": [
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 30,
+                        "durationMicroseconds": 214,
+                        "errorMessage": "",
+                        "functionName": "activeKeys",
+                        "line": 17
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 36,
+                        "durationMicroseconds": 105,
+                        "errorMessage": "Cannot generate efficient code for storing an array in a non-sequence type",
+                        "functionName": "expectedSequence",
+                        "line": 18
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 29,
+                        "durationMicroseconds": 97,
+                        "errorMessage": "Cannot generate efficient code for storing an array in a non-sequence type",
+                        "functionName": "keyColors",
+                        "line": 20
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 27,
+                        "durationMicroseconds": 96,
+                        "errorMessage": "Cannot generate efficient code for storing an array in a non-sequence type",
+                        "functionName": "keyText",
+                        "line": 21
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 33,
+                        "durationMicroseconds": 67,
+                        "errorMessage": "Cannot load property test from (component in /home/anujs/practice/utils/Testground.qml)::appsdata with type QVariant.",
+                        "functionName": "attemptedKeys",
+                        "line": 25
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 52,
+                        "errorMessage": "Cannot load property test from (component in /home/anujs/practice/utils/Testground.qml)::appsdata with type QVariant.",
+                        "functionName": "resetSequence",
+                        "line": 78
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "keyEventToString",
+                        "line": 86
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "checkKeyPress",
+                        "line": 168
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 68,
+                        "errorMessage": "Cannot load property test from (component in /home/anujs/practice/utils/Testground.qml)::appsdata with type QVariant.",
+                        "functionName": "skipRight",
+                        "line": 425
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 5,
+                        "durationMicroseconds": 897,
+                        "errorMessage": "",
+                        "functionName": "skipLeft",
+                        "line": 431
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 66,
+                        "errorMessage": "Cannot load property test from (component in /home/anujs/practice/utils/Testground.qml)::appsdata with type QVariant.",
+                        "functionName": "advanceShortcut",
+                        "line": 437
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 5,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Functions without type annotations won't be compiled",
+                        "functionName": "showResult",
+                        "line": 444
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 19,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on fill.",
+                        "functionName": "fill",
+                        "line": 7
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 20,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on onClicked.",
+                        "functionName": "onClicked",
+                        "line": 41
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 22,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on top.",
+                        "functionName": "top",
+                        "line": 38
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 1,
+                        "errorMessage": "Cannot resolve property type  for binding on left.",
+                        "functionName": "left",
+                        "line": 39
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 227,
+                        "errorMessage": "",
+                        "functionName": "bottom",
+                        "line": 49
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 24,
+                        "durationMicroseconds": 208,
+                        "errorMessage": "",
+                        "functionName": "right",
+                        "line": 50
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 31,
+                        "durationMicroseconds": 95,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 59
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 24,
+                        "durationMicroseconds": 68,
+                        "errorMessage": "Cannot access value for name stackView",
+                        "functionName": "onClicked",
+                        "line": 63
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 97,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 62
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 28,
+                        "durationMicroseconds": 223,
+                        "errorMessage": "",
+                        "functionName": "onCompleted",
+                        "line": 73
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 23,
+                        "durationMicroseconds": 115,
+                        "errorMessage": "",
+                        "functionName": "fill",
+                        "line": 238
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 25,
+                        "durationMicroseconds": 278,
+                        "errorMessage": "Cannot access value for name event",
+                        "functionName": "onPressed",
+                        "line": 243
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 26,
+                        "durationMicroseconds": 93,
+                        "errorMessage": "Cannot access value for name activeKeys",
+                        "functionName": "onReleased",
+                        "line": 278
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 24,
+                        "durationMicroseconds": 221,
+                        "errorMessage": "",
+                        "functionName": "right",
+                        "line": 312
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 22,
+                        "durationMicroseconds": 188,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 313
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 62,
+                        "errorMessage": "Cannot access value for name count",
+                        "functionName": "text",
+                        "line": 322
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 35,
+                        "durationMicroseconds": 95,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 321
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 20,
+                        "durationMicroseconds": 162,
+                        "errorMessage": "",
+                        "functionName": "width",
+                        "line": 329
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 21,
+                        "durationMicroseconds": 137,
+                        "errorMessage": "",
+                        "functionName": "height",
+                        "line": 330
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 35,
+                        "durationMicroseconds": 202,
+                        "errorMessage": "",
+                        "functionName": "horizontalCenter",
+                        "line": 333
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 22,
+                        "durationMicroseconds": 191,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 334
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 28,
+                        "durationMicroseconds": 254,
+                        "errorMessage": "",
+                        "functionName": "topMargin",
+                        "line": 335
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 23,
+                        "durationMicroseconds": 59,
+                        "errorMessage": "Cannot access value for name appsdata",
+                        "functionName": "text",
+                        "line": 340
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 24,
+                        "durationMicroseconds": 50,
+                        "errorMessage": "Cannot access value for name attemptedKeys",
+                        "functionName": "color",
+                        "line": 341
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 43,
+                        "durationMicroseconds": 208,
+                        "errorMessage": "",
+                        "functionName": "horizontalCenter",
+                        "line": 346
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 30,
+                        "durationMicroseconds": 54,
+                        "errorMessage": "Cannot access value for name attemptedKeys",
+                        "functionName": "visible",
+                        "line": 350
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 31,
+                        "durationMicroseconds": 201,
+                        "errorMessage": "",
+                        "functionName": "left",
+                        "line": 356
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 43,
+                        "durationMicroseconds": 95,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 360
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 39,
+                        "durationMicroseconds": 202,
+                        "errorMessage": "",
+                        "functionName": "horizontalCenter",
+                        "line": 370
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 26,
+                        "durationMicroseconds": 202,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 371
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 28,
+                        "durationMicroseconds": 60,
+                        "errorMessage": "Cannot access value for name appsdata",
+                        "functionName": "model",
+                        "line": 376
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 32,
+                        "durationMicroseconds": 64,
+                        "errorMessage": "Cannot access value for name keyColors",
+                        "functionName": "width",
+                        "line": 379
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 33,
+                        "durationMicroseconds": 53,
+                        "errorMessage": "Cannot access value for name keyColors",
+                        "functionName": "height",
+                        "line": 380
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 32,
+                        "durationMicroseconds": 51,
+                        "errorMessage": "Cannot access value for name keyColors",
+                        "functionName": "color",
+                        "line": 382
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 39,
+                        "durationMicroseconds": 52,
+                        "errorMessage": "Cannot access value for name keyColors",
+                        "functionName": "color",
+                        "line": 383
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 35,
+                        "durationMicroseconds": 55,
+                        "errorMessage": "Cannot access value for name keyText",
+                        "functionName": "text",
+                        "line": 392
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 47,
+                        "durationMicroseconds": 116,
+                        "errorMessage": "",
+                        "functionName": "centerIn",
+                        "line": 388
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 27,
+                        "durationMicroseconds": 209,
+                        "errorMessage": "",
+                        "functionName": "right",
+                        "line": 404
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 25,
+                        "durationMicroseconds": 195,
+                        "errorMessage": "",
+                        "functionName": "top",
+                        "line": 405
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 32,
+                        "durationMicroseconds": 243,
+                        "errorMessage": "",
+                        "functionName": "topMargin",
+                        "line": 406
+                    },
+                    {
+                        "codegenSuccessfull": true,
+                        "column": 34,
+                        "durationMicroseconds": 245,
+                        "errorMessage": "",
+                        "functionName": "rightMargin",
+                        "line": 407
+                    },
+                    {
+                        "codegenSuccessfull": false,
+                        "column": 22,
+                        "durationMicroseconds": 131,
+                        "errorMessage": "method advanceShortcut cannot be resolved.",
+                        "functionName": "onTriggered",
+                        "line": 422
+                    }
+                ],
+                "filepath": "/home/anujs/practice/utils/Testground.qml"
+            }
+        ],
+        "moduleId": "practice(apppractice)"
+    }
+]

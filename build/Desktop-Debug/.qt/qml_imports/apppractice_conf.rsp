@@ -1,0 +1,15 @@
+-rootPath
+/home/anujs/practice
+-cmake-output
+-output-file
+/home/anujs/practice/build/Desktop-Debug/.qt/qml_imports/apppractice_conf.cmake
+-importPath
+/home/anujs/practice/build/Desktop-Debug/practice
+-importPath
+/home/anujs/practice/build/Desktop-Debug
+-importPath
+/usr/lib/qt6/qml
+-qrcFiles
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/qmake_practice.qrc
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/apppractice_raw_qml_0.qrc
+/home/anujs/practice/build/Desktop-Debug/.qt/rcc/apppractice_raw_qml_0_extra_qmldirs.qrc

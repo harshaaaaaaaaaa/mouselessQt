@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/figma.png</file>
+        <file>Images/vim.png</file>
+        <file>Images/vscode.png</file>
+        <file>Images/webflow.png</file>
+    </qresource>
+</RCC>

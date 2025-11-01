@@ -11,6 +11,8 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(apppractice
     main.cpp
+    userdatamanager.h
+    userdatamanager.cpp
 )
 
 qt_add_qml_module(apppractice
@@ -18,20 +20,18 @@ qt_add_qml_module(apppractice
     VERSION 1.0
     QML_FILES
         Main.qml
-        QML_FILES
-        QML_FILES
-        QML_FILES
-        QML_FILES keydata.js
-        QML_FILES utils/ShortcutView.qml
-        QML_FILES utils/CategoryView.qml
-        QML_FILES utils/AppsView.qml
-        RESOURCES Resource.qrc
-        QML_FILES
-        QML_FILES utils/Testground.qml
-        QML_FILES vstestdata.js
-        QML_FILES utils/Result.qml
-        QML_FILES utils/KeyAnalysis.qml
-        QML_FILES
+        keydata.js
+        vstestdata.js
+        utils/ShortcutView.qml
+        utils/CategoryView.qml
+        utils/AppsView.qml
+        utils/Testground.qml
+        utils/Result.qml
+        utils/KeyAnalysis.qml
+        utils/UserManager.qml
+        utils/Settings.qml
+    RESOURCES
+        Resource.qrc
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

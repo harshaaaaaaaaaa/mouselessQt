@@ -342,6 +342,16 @@ Page {
         resultDisplay.color = success ? "green" : "red"
         resultDisplay.opacity = 1
         if (!success) errorResetTimer.restart()
+
+        // Save practice session
+        if (userDataManager.currentUser !== "") {
+            userDataManager.savePracticeSession(
+                appsdata.id || "unknown",
+                appsdata.title || "practice",
+                appsdata.shortcuts[currentIndex].title,
+                success
+            )
+        }
     }
 }
 

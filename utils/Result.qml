@@ -26,8 +26,23 @@ Rectangle{
          wrongkey = wrong;
      }
 
-    Component.onCompleted: updateKeyCounts()
+    Component.onCompleted: {
+        updateKeyCounts()
+        saveTestSession()
+    }
     onAttemptedKeysChanged: updateKeyCounts()
+
+    function saveTestSession() {
+        var score = 4*correctkey - wrongkey
+        userDataManager.saveTestSession(
+            appsdata.id,
+            appsdata.test ? "test" : "unknown",
+            attemptedKeys,
+            correctkey,
+            wrongkey,
+            score
+        )
+    }
 
     Button {
         id: backButton

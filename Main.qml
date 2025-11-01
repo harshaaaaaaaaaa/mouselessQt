@@ -14,7 +14,7 @@ ApplicationWindow {
     StackView {
            id: stackView
            anchors.fill: parent
-           initialItem: AppsView {
+           initialItem: UserManager {
                appsdata: Fn.appsdata
                stackView: stackView
            }

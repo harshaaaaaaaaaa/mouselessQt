@@ -53,6 +53,15 @@ public:
     Q_INVOKABLE QVariantList getPracticeHistory(const QString &appId);
     Q_INVOKABLE QVariantMap getOverallStats();
 
+    // Session state management
+    Q_INVOKABLE void saveSessionState(const QString &appId,
+                                       const QString &sessionType,
+                                       const QVariantMap &sessionData);
+    Q_INVOKABLE QVariantMap loadSessionState(const QString &appId,
+                                             const QString &sessionType);
+    Q_INVOKABLE void clearSessionState(const QString &appId,
+                                       const QString &sessionType);
+
     // Backup and restore
     Q_INVOKABLE bool createBackup(const QString &backupPath);
     Q_INVOKABLE bool restoreBackup(const QString &backupPath);

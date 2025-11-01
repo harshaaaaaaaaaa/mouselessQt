@@ -42,6 +42,8 @@ Rectangle{
             wrongkey,
             score
         )
+        // Clear session state since test is complete
+        userDataManager.clearSessionState(appsdata.id || "unknown", "testground")
     }
 
     Button {

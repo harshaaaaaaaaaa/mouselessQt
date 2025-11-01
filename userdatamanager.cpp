@@ -267,6 +267,58 @@ QVariantMap UserDataManager::getOverallStats()
     return m_userData.value("stats").toMap();
 }
 
+void UserDataManager::saveSessionState(const QString &appId,
+                                        const QString &sessionType,
+                                        const QVariantMap &sessionData)
+{
+    if (m_currentUser.isEmpty()) {
+        return;
+    }
+
+    // Get or create appProgress map
+    QVariantMap appProgress = m_userData.value("appProgress").toMap();
+    QVariantMap appData = appProgress.value(appId).toMap();
+
+    // Save session state under sessionStates key
+    QVariantMap sessionStates = appData.value("sessionStates").toMap();
+    sessionStates[sessionType] = sessionData;
+    appData["sessionStates"] = sessionStates;
+
+    // Update app progress
+    appProgress[appId] = appData;
+    m_userData["appProgress"] = appProgress;
+
+    saveUserData();
+}
+
+QVariantMap UserDataManager::loadSessionState(const QString &appId,
+                                              const QString &sessionType)
+{
+    QVariantMap appData = getAppProgress(appId);
+    QVariantMap sessionStates = appData.value("sessionStates").toMap();
+    return sessionStates.value(sessionType).toMap();
+}
+
+void UserDataManager::clearSessionState(const QString &appId,
+                                        const QString &sessionType)
+{
+    if (m_currentUser.isEmpty()) {
+        return;
+    }
+
+    QVariantMap appProgress = m_userData.value("appProgress").toMap();
+    QVariantMap appData = appProgress.value(appId).toMap();
+    QVariantMap sessionStates = appData.value("sessionStates").toMap();
+
+    // Remove the session state
+    sessionStates.remove(sessionType);
+    appData["sessionStates"] = sessionStates;
+    appProgress[appId] = appData;
+    m_userData["appProgress"] = appProgress;
+
+    saveUserData();
+}
+
 bool UserDataManager::createBackup(const QString &backupPath)
 {
     if (m_currentUser.isEmpty()) {

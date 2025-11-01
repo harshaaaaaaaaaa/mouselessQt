@@ -119,11 +119,28 @@ Page {
         Keys.onPressed: {
             if (event.isAutoRepeat) return
 
+            // Esc or Ctrl+Esc to exit practice mode
             if (event.key === Qt.Key_Escape) {
                 if(stackView) stackView.pop()
                 event.accepted=true
                 return
-            } else if(event.key === Qt.Key_Right && currentStep==0) {
+            }
+
+            // Alt+navigation to avoid conflicts with actual shortcuts
+            if (currentStep == 0) {
+                if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Right) {
+                    skipRight()
+                    event.accepted = true
+                    return
+                } else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Left) {
+                    skipLeft()
+                    event.accepted = true
+                    return
+                }
+            }
+
+            // Original arrow navigation (kept for compatibility)
+            if(event.key === Qt.Key_Right && currentStep==0) {
                 skipRight()
             } else if(event.key === Qt.Key_Left && currentStep==0) {
                 skipLeft()

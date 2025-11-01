@@ -38,7 +38,261 @@ Page{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 10
-        onClicked: stackView.pop()
+        onClicked: {
+            saveSession()
+            stackView.pop()
+        }
+    }
+
+    // Help button
+    property bool showHelp: false
+
+    Rectangle {
+        id: helpButton
+        height: 30
+        width: 30
+        radius: 15
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 15
+        color: mouseAreaHelp.containsMouse ? "#7cfc00" : "#555555"
+        border.color: "#7cfc00"
+        border.width: 2
+        z: 100
+
+        Text {
+            text: "?"
+            font.bold: true
+            font.pixelSize: 16
+            color: "white"
+            anchors.centerIn: parent
+        }
+
+        MouseArea {
+            id: mouseAreaHelp
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: showHelp = !showHelp
+        }
+    }
+
+    // Help overlay
+    Rectangle {
+        id: helpOverlay
+        anchors.fill: parent
+        color: "#dd000000"
+        visible: showHelp
+        z: 1000
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: showHelp = false
+        }
+
+        Rectangle {
+            width: Math.min(parent.width * 0.8, 500)
+            height: Math.min(parent.height * 0.8, 500)
+            anchors.centerIn: parent
+            color: "#1a1a1a"
+            radius: 10
+            border.color: "#7cfc00"
+            border.width: 2
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 10
+
+                Text {
+                    text: "⌨️ Keyboard Shortcuts"
+                    font.pixelSize: 22
+                    font.bold: true
+                    color: "#7cfc00"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Rectangle { width: parent.width; height: 1; color: "#333333" }
+
+                Text {
+                    text: "Navigation (when idle):"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#ffaa00"
+                }
+                Text {
+                    text: "  ← → Arrow keys - Previous/Next"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+                Text {
+                    text: "  Alt+← Alt+→ - Safer navigation"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+                Text {
+                    text: "  Alt+↓ - Skip question"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+
+                Rectangle { width: parent.width; height: 1; color: "#222222" }
+
+                Text {
+                    text: "Exit & Save:"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#ffaa00"
+                }
+                Text {
+                    text: "  Ctrl+Esc - Save & exit"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+
+                Rectangle { width: parent.width; height: 1; color: "#222222" }
+
+                Text {
+                    text: "Testing:"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#ffaa00"
+                }
+                Text {
+                    text: "  🟢 Green - Correct key"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+                Text {
+                    text: "  🔴 Red - Wrong key"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+                Text {
+                    text: "  Release early to retry"
+                    font.pixelSize: 13
+                    color: "#cccccc"
+                }
+
+                Item { Layout.fillHeight: true }
+
+                Button {
+                    text: "Close"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 35
+                    onClicked: showHelp = false
+
+                    background: Rectangle {
+                        color: parent.pressed ? "#5fb800" : "#7cfc00"
+                        radius: 5
+                    }
+
+                    contentItem: Text {
+                        text: parent.text
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: "black"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+        }
+    }
+
+    // Navigation buttons row
+    Row {
+        id: navigationButtons
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.margins: 10
+        spacing: 10
+
+        Rectangle {
+            id: prevButton
+            height: 40
+            width: 90
+            radius: 5
+            color: mouseAreaPrev.containsMouse ? "#555555" : "#333333"
+            border.color: "#666666"
+            border.width: 1
+
+            Text {
+                text: "◀ Previous"
+                font.bold: true
+                font.pixelSize: 12
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                id: mouseAreaPrev
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    if (currentStep === 0) {
+                        skipLeft()
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            id: skipButton
+            height: 40
+            width: 70
+            radius: 5
+            color: mouseAreaSkip.containsMouse ? "#666600" : "#999933"
+            border.color: "#aaaa44"
+            border.width: 1
+
+            Text {
+                text: "Skip ⤵"
+                font.bold: true
+                font.pixelSize: 12
+                color: "black"
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                id: mouseAreaSkip
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    if (currentStep === 0) {
+                        skipRight()
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            id: nextButton
+            height: 40
+            width: 90
+            radius: 5
+            color: mouseAreaNext.containsMouse ? "#555555" : "#333333"
+            border.color: "#666666"
+            border.width: 1
+
+            Text {
+                text: "Next ▶"
+                font.bold: true
+                font.pixelSize: 12
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                id: mouseAreaNext
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    if (currentStep === 0) {
+                        skipRight()
+                    }
+                }
+            }
+        }
     }
 
     Rectangle{
@@ -49,7 +303,10 @@ Page{
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.margins: 10
-        color:"yellow"
+        color: mouseAreaSubmit.containsMouse ? "#ffff00" : "#dddd00"
+        border.color: "#ffff66"
+        border.width: 1
+
         Text {
             id: sub
             text: "Submit"
@@ -59,8 +316,11 @@ Page{
             anchors.centerIn: parent
         }
         MouseArea {
+            id: mouseAreaSubmit
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: {
+                saveSession()  // Save before submitting
                 stackView.push("Result.qml", {
                     attemptedKeys:attemptedKeys,
                     appsdata:appsdata,
@@ -71,8 +331,42 @@ Page{
     }
 
     Component.onCompleted: {
+        loadSession()
         resetSequence()
         keyHandler.forceActiveFocus()
+    }
+
+    Component.onDestruction: {
+        saveSession()
+    }
+
+    function loadSession() {
+        if (userDataManager.currentUser !== "") {
+            var session = userDataManager.loadSessionState(appsdata.id || "unknown", "testground")
+            if (session && session.currentIndex !== undefined) {
+                currentIndex = session.currentIndex || 0
+                count = session.count || 1
+                if (session.attemptedKeys) {
+                    // Restore attempted keys
+                    for (var i = 0; i < session.attemptedKeys.length && i < attemptedKeys.length; i++) {
+                        attemptedKeys[i] = session.attemptedKeys[i]
+                    }
+                }
+            }
+        }
+    }
+
+    function saveSession() {
+        if (userDataManager.currentUser !== "") {
+            // Save current session state
+            var sessionData = {
+                "currentIndex": currentIndex,
+                "count": count,
+                "attemptedKeys": attemptedKeys,
+                "timestamp": new Date().toISOString()
+            }
+            userDataManager.saveSessionState(appsdata.id || "unknown", "testground", sessionData)
+        }
     }
 
     function resetSequence() {
@@ -244,7 +538,39 @@ Page{
 
             if (event.isAutoRepeat)
                 return
-            else if (event.key === Qt.Key_Right && currentStep == 0) {
+
+            // Ctrl+Esc to exit testground
+            if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Escape) {
+                saveSession()
+                stackView.pop()
+                event.accepted = true
+                return
+            }
+
+            // Navigation only when not in middle of entering shortcut
+            if (currentStep == 0) {
+                // Alt+Right for next question (avoid conflict with shortcuts)
+                if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Right) {
+                    skipRight()
+                    event.accepted = true
+                    return
+                }
+                // Alt+Left for previous question
+                else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Left) {
+                    skipLeft()
+                    event.accepted = true
+                    return
+                }
+                // Alt+Down to skip current question
+                else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Down) {
+                    skipRight()
+                    event.accepted = true
+                    return
+                }
+            }
+
+            // Original arrow key navigation (kept for compatibility)
+            if (event.key === Qt.Key_Right && currentStep == 0) {
                 skipRight()
             } else if (event.key === Qt.Key_Left && currentStep == 0) {
                 skipLeft()

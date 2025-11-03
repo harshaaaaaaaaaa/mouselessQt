@@ -4,18 +4,88 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: main
-    color: "#000000"
+    color: "#0a0a0a"
     required property var appsdata
     required property StackView stackView
     required property var attemptedKeys
 
-    Button {
-        id: backButton
-        text: "Back"
+    // Header with navigation
+    Rectangle {
+        id: headerBar
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.margins: 10
-        onClicked: stackView.pop()
+        anchors.right: parent.right
+        height: 50
+        color: "#111111"
+        z: 100
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+
+            Button {
+                Layout.preferredHeight: 35
+                Layout.preferredWidth: 80
+
+                background: Rectangle {
+                    color: parent.hovered ? "#1e1e1e" : "#151515"
+                    radius: 6
+                    border.color: "#333333"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: "← Back"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: stackView.pop()
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Text {
+                text: "Key Analysis"
+                font.pixelSize: 14
+                font.bold: true
+                color: "#6fda00"
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Button {
+                Layout.preferredHeight: 35
+                Layout.preferredWidth: 80
+
+                background: Rectangle {
+                    color: parent.hovered ? "#6fda00" : "#151515"
+                    radius: 6
+                    border.color: "#6fda00"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: "🏠 Home"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: parent.parent.hovered ? "#0a0a0a" : "#6fda00"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    while (stackView.depth > 1) {
+                        stackView.pop()
+                    }
+                }
+            }
+        }
+    }
     }
 
     Rectangle {
@@ -23,7 +93,7 @@ Rectangle {
         color: "black"
         width: parent.width / 1.2
         anchors {
-            top: backButton.bottom
+            top: headerBar.bottom
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
             topMargin: backButton.height / 1.2

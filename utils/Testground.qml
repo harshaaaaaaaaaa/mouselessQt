@@ -76,6 +76,12 @@ Page {
 
     function keyEventToString(event) {
         var key = event.key
+
+        // Number pad keys
+        if (key >= Qt.Key_0 && key <= Qt.Key_9 && (event.modifiers & Qt.KeypadModifier)) {
+            return String.fromCharCode('0'.charCodeAt(0) + (key - Qt.Key_0))
+        }
+
         switch (key) {
         case Qt.Key_Control: return "Ctrl"
         case Qt.Key_Alt: return "Alt"
@@ -137,9 +143,9 @@ Page {
         } else if (currentKey === "PageUp") {
             keyMatch = event.key === Qt.Key_PageUp
         } else if (currentKey === "Space") {
-            keyMatch = event.key === Qt.Key_Space
+            keyMatch = event.key === Qt.Key_Space && currentStep > 0  // Only match Space if not idle
         } else if (currentKey === "Tab") {
-            keyMatch = event.key === Qt.Qt.Key_Tab
+            keyMatch = event.key === Qt.Key_Tab
         } else if (currentKey === "Backtab") {
             keyMatch = event.key === Qt.Key_Backtab
         } else if (currentKey === "Backspace") {
@@ -156,6 +162,12 @@ Page {
             keyMatch = event.key === Qt.Key_Up
         } else if (currentKey === "Down") {
             keyMatch = event.key === Qt.Key_Down
+        } else if (currentKey === "Left") {
+            keyMatch = event.key === Qt.Key_Left
+        } else if (currentKey === "Right") {
+            keyMatch = event.key === Qt.Key_Right
+        } else if (currentKey === "Esc" || currentKey === "Escape") {
+            keyMatch = event.key === Qt.Key_Escape
         } else if (currentKey === "F1") {
             keyMatch = event.key === Qt.Key_F1
         } else if (currentKey === "F2") {
@@ -258,6 +270,13 @@ Page {
 
             Item { Layout.fillWidth: true }
 
+            Text {
+                text: "Test Mode - Guess the Keys!"
+                font.pixelSize: 14
+                font.bold: true
+                color: "#ff8800"
+            }
+
             // Help button
             Button {
                 Layout.preferredHeight: 35
@@ -299,54 +318,34 @@ Page {
         Keys.onPressed: {
             if (event.isAutoRepeat) return
 
-            // Ctrl+Esc to exit
-            if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_Escape) {
-                saveSession()
-                stackView.pop()
+            // Space bar to skip (when idle, no conflicts)
+            if (event.key === Qt.Key_Space && currentStep === 0) {
+                skipRight()
                 event.accepted = true
                 return
             }
 
-            // Alt+navigation (conflict-free)
-            if (currentStep == 0) {
-                if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Right) {
-                    skipRight()
-                    event.accepted = true
-                    return
-                } else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Left) {
-                    skipLeft()
-                    event.accepted = true
-                    return
-                }
-            }
+            // Process shortcut key press
+            const currentKey = expectedSequence[currentStep]
+            var newColors = keyColors.slice()
+            var newText = keyText.slice()
+            newText[currentStep] = keyEventToString(event)
+            newColors[currentStep] = checkKeyPress(event) ? "green" : "red"
 
-            // Regular arrow navigation
-            if (event.key === Qt.Key_Right && currentStep == 0) {
-                skipRight()
-            } else if (event.key === Qt.Key_Left && currentStep == 0) {
-                skipLeft()
-            } else {
-                const currentKey = expectedSequence[currentStep]
-                var newColors = keyColors.slice()
-                var newText = keyText.slice()
-                newText[currentStep] = keyEventToString(event)
-                newColors[currentStep] = checkKeyPress(event) ? "green" : "red"
+            keyColors = newColors
+            keyText = newText
+            activeKeys[currentKey] = true
+            currentStep++
 
-                keyColors = newColors
-                keyText = newText
-                activeKeys[currentKey] = true
-                currentStep++
+            if (currentStep === expectedSequence.length) {
+                var isallkeys = keyColors.includes("red")
+                attemptedKeys[currentIndex].attempt = true
+                attemptedKeys[currentIndex].correct = !isallkeys
+                attemptedKeys[currentIndex].keypressed = keyText
+                attemptedKeys[currentIndex].color = keyColors
 
-                if (currentStep === expectedSequence.length) {
-                    var isallkeys = keyColors.includes("red")
-                    attemptedKeys[currentIndex].attempt = true
-                    attemptedKeys[currentIndex].correct = !isallkeys
-                    attemptedKeys[currentIndex].keypressed = keyText
-                    attemptedKeys[currentIndex].color = keyColors
-
-                    showResult(true)
-                    nextShortcutTimer.start()
-                }
+                showResult(true)
+                nextShortcutTimer.start()
             }
         }
 
@@ -358,8 +357,8 @@ Page {
                 (key === "Enter" && (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)) ||
                 (event.key === key.charCodeAt(0)))
 
-            if ((event.key === Qt.Key_Right || event.key === Qt.Key_Left) && currentStep == 0) {
-                resetSequence()
+            if (event.key === Qt.Key_Space && currentStep == 0) {
+                // Space was used to skip, do nothing
             } else if (!releasedKey && currentStep === expectedSequence.length) {
                 delete activeKeys[releasedKey]
             } else if (releasedKey) {
@@ -400,7 +399,7 @@ Page {
                 }
             }
 
-            // Shortcut title
+            // Shortcut title - NO KEYS SHOWN (test mode)
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: appsdata.test[currentIndex].title
@@ -430,13 +429,21 @@ Page {
                 }
             }
 
-            // Keys row
+            // Instruction text
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Type the shortcut keys"
+                font.pixelSize: 16
+                color: "#888888"
+            }
+
+            // Key slots (EMPTY - user has to guess!)
             Row {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 15
 
                 Repeater {
-                    model: appsdata.test[currentIndex].keys
+                    model: expectedSequence.length
 
                     Rectangle {
                         width: 70
@@ -448,7 +455,6 @@ Page {
                                      keyColors[index] === "red" ? "#ff0000" : "#444444"
                         border.width: 2
 
-                        // Smooth scale animation
                         scale: keyColors[index] !== "white" ? 1.05 : 1.0
                         Behavior on scale {
                             NumberAnimation { duration: 100; easing.type: Easing.OutQuad }
@@ -460,13 +466,14 @@ Page {
                             ColorAnimation { duration: 150 }
                         }
 
+                        // Show what user typed (NOT the expected key)
                         Text {
                             anchors.centerIn: parent
-                            text: keyText[index] || modelData
+                            text: keyText[index] || "?"
                             font.pixelSize: 16
                             font.bold: true
                             color: keyColors[index] === "green" ? "#00ff00" :
-                                   keyColors[index] === "red" ? "#ff0000" : "#888888"
+                                   keyColors[index] === "red" ? "#ff0000" : "#444444"
                         }
 
                         // Checkmark/X indicator
@@ -515,118 +522,80 @@ Page {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 70
+        height: 80
         color: "#111111"
 
-        RowLayout {
+        ColumnLayout {
             anchors.centerIn: parent
-            spacing: 12
+            spacing: 8
 
-            // Previous button
-            Button {
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: 45
-                enabled: currentStep === 0
-
-                background: Rectangle {
-                    color: parent.enabled ? (parent.hovered ? "#252525" : "#1a1a1a") : "#0f0f0f"
-                    radius: 8
-                    border.color: parent.enabled ? "#444444" : "#222222"
-                    border.width: 1
-                }
-
-                contentItem: Text {
-                    text: "← Previous"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: parent.parent.enabled ? "#ffffff" : "#444444"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                onClicked: skipLeft()
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Press SPACE to skip"
+                font.pixelSize: 11
+                color: "#888888"
             }
 
-            // Skip button
-            Button {
-                Layout.preferredWidth: 80
-                Layout.preferredHeight: 45
-                enabled: currentStep === 0
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 12
 
-                background: Rectangle {
-                    color: parent.enabled ? (parent.hovered ? "#8a8a2a" : "#6a6a1a") : "#2a2a0a"
-                    radius: 8
-                    border.color: parent.enabled ? "#aaaa44" : "#444422"
-                    border.width: 1
+                // Skip button
+                Button {
+                    Layout.preferredWidth: 100
+                    Layout.preferredHeight: 45
+                    enabled: currentStep === 0
+
+                    background: Rectangle {
+                        color: parent.enabled ? (parent.hovered ? "#8a8a2a" : "#6a6a1a") : "#2a2a0a"
+                        radius: 8
+                        border.color: parent.enabled ? "#aaaa44" : "#444422"
+                        border.width: 1
+                    }
+
+                    contentItem: Text {
+                        text: "Skip (Space)"
+                        font.pixelSize: 12
+                        font.bold: true
+                        color: parent.parent.enabled ? "#ffffff" : "#666644"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    onClicked: skipRight()
                 }
 
-                contentItem: Text {
-                    text: "Skip ⤵"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: parent.parent.enabled ? "#ffffff" : "#666644"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+                Item { width: 20 }
 
-                onClicked: skipRight()
-            }
+                // Submit button
+                Button {
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 45
 
-            // Next button
-            Button {
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: 45
-                enabled: currentStep === 0
+                    background: Rectangle {
+                        color: parent.hovered ? "#7fea10" : "#6fda00"
+                        radius: 8
+                        border.color: "#8ffa20"
+                        border.width: 1
+                    }
 
-                background: Rectangle {
-                    color: parent.enabled ? (parent.hovered ? "#252525" : "#1a1a1a") : "#0f0f0f"
-                    radius: 8
-                    border.color: parent.enabled ? "#444444" : "#222222"
-                    border.width: 1
-                }
+                    contentItem: Text {
+                        text: "Submit Test"
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: "#000000"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
 
-                contentItem: Text {
-                    text: "Next →"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: parent.parent.enabled ? "#ffffff" : "#444444"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                onClicked: skipRight()
-            }
-
-            Item { width: 20 }
-
-            // Submit button
-            Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 45
-
-                background: Rectangle {
-                    color: parent.hovered ? "#7fea10" : "#6fda00"
-                    radius: 8
-                    border.color: "#8ffa20"
-                    border.width: 1
-                }
-
-                contentItem: Text {
-                    text: "Submit Test"
-                    font.pixelSize: 14
-                    font.bold: true
-                    color: "#000000"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                onClicked: {
-                    saveSession()
-                    stackView.push("Result.qml", {
-                        attemptedKeys: attemptedKeys,
-                        appsdata: appsdata,
-                        stackView: stackView
-                    })
+                    onClicked: {
+                        saveSession()
+                        stackView.push("Result.qml", {
+                            attemptedKeys: attemptedKeys,
+                            appsdata: appsdata,
+                            stackView: stackView
+                        })
+                    }
                 }
             }
         }
@@ -660,7 +629,7 @@ Page {
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "⌨️ Keyboard Shortcuts"
+                    text: "⌨️ Test Mode Help"
                     font.pixelSize: 24
                     font.bold: true
                     color: "#6fda00"
@@ -681,60 +650,67 @@ Page {
                         width: parent.width
                         spacing: 15
 
-                        // Navigation section
                         Text {
-                            text: "Navigation (when idle):"
+                            text: "How to Test:"
                             font.pixelSize: 16
                             font.bold: true
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  ← → Arrow keys - Previous/Next question"
+                            text: "  1. Read the shortcut name"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Alt+← Alt+→ - Safe navigation (no conflicts)"
+                            text: "  2. Type the keys you think are correct"
+                            font.pixelSize: 13
+                            color: "#cccccc"
+                        }
+                        Text {
+                            text: "  3. Green = Correct, Red = Wrong"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
 
                         Rectangle { width: parent.width; height: 1; color: "#252525" }
 
-                        // Exit section
                         Text {
-                            text: "Exit & Save:"
+                            text: "Navigation:"
                             font.pixelSize: 16
                             font.bold: true
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  Ctrl+Esc - Save progress and exit"
+                            text: "  SPACE - Skip question (safe!)"
+                            font.pixelSize: 13
+                            color: "#cccccc"
+                        }
+                        Text {
+                            text: "  Release keys early - Reset and try again"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
 
                         Rectangle { width: parent.width; height: 1; color: "#252525" }
 
-                        // Testing section
                         Text {
-                            text: "Testing:"
+                            text: "Tips:"
                             font.pixelSize: 16
                             font.bold: true
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  🟢 Green - Correct key pressed"
+                            text: "  • Keys are HIDDEN - you must guess!"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  🔴 Red - Wrong key pressed"
+                            text: "  • Use Learning Mode to practice first"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Release early - Reset and try again"
+                            text: "  • All keys work including Esc, arrows, F-keys"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }

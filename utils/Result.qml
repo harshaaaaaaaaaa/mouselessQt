@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 Rectangle{
      id:root
      anchors.fill: parent
-     color:"black"
+     color:"#0a0a0a"
      visible: true
 
      required property var appsdata
@@ -46,54 +46,118 @@ Rectangle{
         userDataManager.clearSessionState(appsdata.id || "unknown", "testground")
     }
 
-    Button {
-        id: backButton
-        text: "Back"
+    // Header with navigation
+    Rectangle {
+        id: headerBar
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.margins: 10
-        onClicked: stackView.pop()
+        anchors.right: parent.right
+        height: 50
+        color: "#111111"
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+
+            Button {
+                Layout.preferredHeight: 35
+                Layout.preferredWidth: 80
+
+                background: Rectangle {
+                    color: parent.hovered ? "#1e1e1e" : "#151515"
+                    radius: 6
+                    border.color: "#333333"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: "← Back"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: stackView.pop()
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Button {
+                Layout.preferredHeight: 35
+                Layout.preferredWidth: 80
+
+                background: Rectangle {
+                    color: parent.hovered ? "#6fda00" : "#151515"
+                    radius: 6
+                    border.color: "#6fda00"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: "🏠 Home"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: parent.parent.hovered ? "#000000" : "#6fda00"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    // Go back to home (AppsView)
+                    while (stackView.depth > 1) {
+                        stackView.pop()
+                    }
+                }
+            }
+        }
     }
 
     Row {
           visible: true
           spacing: parent.width/2
           anchors{
-                 top: parent.top
-                 topMargin: parent.height/10
+                 top: headerBar.bottom
+                 topMargin: 30
                 horizontalCenter: parent.horizontalCenter
             }
          Text {
                 id: score
-                text: "Score : " + `${4*correctkey-wrongkey}/${4*attemptedKeys.length}`
+                text: "Score: " + `${4*correctkey-wrongkey}/${4*attemptedKeys.length}`
                 font.bold: true
-                font.pixelSize: 35
-                color:"white"
+                font.pixelSize: 32
+                color:"#6fda00"
              }
          Rectangle{
                   id:keyAnalysis
-                  height:50
-                  width:100
-                  radius: 5
-                  color:"yellow"
+                  height:45
+                  width:140
+                  radius: 8
+                  color: mouseArea.containsMouse ? "#7fea10" : "#6fda00"
+
+                  MouseArea {
+                      id: mouseArea
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      onClicked: {
+                          stackView.push("KeyAnalysis.qml", {
+                             attemptedKeys:attemptedKeys,
+                              appsdata:appsdata,
+                              stackView: stackView
+                          })
+                      }
+                  }
+
            Text {
                 anchors.centerIn: parent
                 id: mark
                 text: "Key Analysis"
                 font.bold: true
-                font.pixelSize: 16
-                color:"red"
+                font.pixelSize: 14
+                color:"#000000"
              }
-           MouseArea {
-               anchors.fill: parent
-               onClicked: {
-                   stackView.push("KeyAnalysis.qml", {
-                      attemptedKeys:attemptedKeys,
-                       appsdata:appsdata,
-                       stackView: stackView
-                   })
-               }
-           }
          }
        }
 
@@ -153,27 +217,25 @@ Rectangle{
             }
          Text {
                 id: correct
-                text: "Correct:" + `${correctkey}`
+                text: "Correct: " + `${correctkey}`
                 font.bold: true
-                font.pixelSize: 25
-                color:"green"
+                font.pixelSize: 22
+                color:"#00ff00"
              }
          Text {
                 id: wrong
-                text: "Wrong:" + `${wrongkey}`
+                text: "Wrong: " + `${wrongkey}`
                 font.bold: true
-                font.pixelSize: 25
-                color:"red"
+                font.pixelSize: 22
+                color:"#ff0000"
              }
        Text {
               id: notattempt
-              text: "Notattempt:" + `${attemptedKeys.length-wrongkey-correctkey}`
+              text: "Not attempted: " + `${attemptedKeys.length-wrongkey-correctkey}`
               font.bold: true
-              font.pixelSize: 25
-              color:"yellow"
+              font.pixelSize: 22
+              color:"#ffaa00"
              }
        }
 
 }
-
-

@@ -140,7 +140,7 @@ Page {
         } else if (currentKey === "Space") {
             keyMatch = event.key === Qt.Key_Space
         } else if (currentKey === "Tab") {
-            keyMatch = event.key === Qt.Qt.Key_Tab
+            keyMatch = event.key === Qt.Key_Tab
         } else if (currentKey === "Backtab") {
             keyMatch = event.key === Qt.Key_Backtab
         } else if (currentKey === "Backspace") {
@@ -157,6 +157,12 @@ Page {
             keyMatch = event.key === Qt.Key_Up
         } else if (currentKey === "Down") {
             keyMatch = event.key === Qt.Key_Down
+        } else if (currentKey === "Left") {
+            keyMatch = event.key === Qt.Key_Left
+        } else if (currentKey === "Right") {
+            keyMatch = event.key === Qt.Key_Right
+        } else if (currentKey === "Esc" || currentKey === "Escape") {
+            keyMatch = event.key === Qt.Key_Escape
         } else if (currentKey === "F1") {
             keyMatch = event.key === Qt.Key_F1
         } else if (currentKey === "F2") {
@@ -315,8 +321,8 @@ Page {
                 return
             }
 
-            // Handle Space key for navigation (only when idle)
-            if (event.key === Qt.Key_Space && currentStep === 0) {
+            // Handle Space key for navigation (only when idle AND Space is not expected)
+            if (event.key === Qt.Key_Space && currentStep === 0 && expectedSequence[0] !== "Space") {
                 // Restart timer on each space press
                 spaceResetTimer.restart()
                 spaceCount++
@@ -357,8 +363,8 @@ Page {
                 return
             }
 
-            // Process shortcut key press (allow Space if in sequence)
-            if (currentStep > 0 && event.key === Qt.Key_Space) {
+            // Process shortcut key press
+            if (event.key === Qt.Key_Space) {
                 debugInfo = "Space is part of shortcut, processing normally..."
             }
 
@@ -540,13 +546,10 @@ Page {
 
     Timer {
         id: resetTimer
-        interval: 500
+        interval: 1000
         onTriggered: {
-            currentStep = 0
-            activeKeys = {}
-            keyColors = new Array(appsdata.shortcuts[currentIndex].keys.length).fill("white")
-            expectedSequence = appsdata.shortcuts[currentIndex].keys
-            resultDisplay.opacity = 0
+            // Advance to next shortcut even on wrong answer (for learning)
+            advanceShortcut()
         }
     }
 

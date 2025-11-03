@@ -6,23 +6,24 @@ import QtQuick.Dialogs
 Rectangle {
     id: root
     anchors.fill: parent
-    color: "#000000"
+    color: "#0a0a0a"
 
     required property StackView stackView
+
+    property string statusMessage: ""
+    property string statusColor: "#6fda00"
 
     Connections {
         target: userDataManager
         function onSuccessMessage(message) {
-            statusText.text = message
-            statusText.color = "green"
-            statusText.visible = true
+            statusMessage = message
+            statusColor = "#6fda00"
             statusTimer.restart()
         }
 
         function onErrorOccurred(message) {
-            statusText.text = message
-            statusText.color = "red"
-            statusText.visible = true
+            statusMessage = message
+            statusColor = "#ff4444"
             statusTimer.restart()
         }
     }
@@ -31,36 +32,41 @@ Rectangle {
         updateStats()
     }
 
-    property var stats: ({})
-
     function updateStats() {
-        stats = userDataManager.getOverallStats()
-        statsColumn.updateDisplay()
+        var s = userDataManager.getOverallStats()
+        statsText.text = `Tests: ${s.totalTests} · Score: ${s.totalScore} · Avg: ${(s.averageScore || 0).toFixed(1)}`
     }
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 20
-        spacing: 15
+    // Header
+    Rectangle {
+        id: headerBar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 60
+        color: "#111111"
 
-        // Header
         RowLayout {
-            Layout.fillWidth: true
+            anchors.fill: parent
+            anchors.margins: 15
             spacing: 15
 
             Button {
-                text: "< Back"
-                font.pixelSize: 16
+                Layout.preferredHeight: 40
+                Layout.preferredWidth: 90
 
                 background: Rectangle {
-                    color: parent.pressed ? "#555555" : "#333333"
-                    radius: 5
+                    color: parent.hovered ? "#252525" : "#1a1a1a"
+                    radius: 8
+                    border.color: "#333333"
+                    border.width: 1
                 }
 
                 contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: "white"
+                    text: "← Back"
+                    font.pixelSize: 14
+                    font.bold: true
+                    color: "#ffffff"
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -69,221 +75,261 @@ Rectangle {
             }
 
             Text {
-                text: "Settings & Backup"
-                font.pixelSize: 32
-                font.bold: true
-                color: "#7cfc00"
                 Layout.fillWidth: true
+                text: "Settings"
+                font.pixelSize: 28
+                font.bold: true
+                color: "#6fda00"
             }
         }
+    }
 
-        // Status message
-        Text {
-            id: statusText
-            text: ""
-            font.pixelSize: 14
-            color: "green"
-            Layout.fillWidth: true
-            visible: false
-            wrapMode: Text.WordWrap
-        }
+    // Main content
+    ScrollView {
+        anchors.top: headerBar.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 20
+        clip: true
 
-        Timer {
-            id: statusTimer
-            interval: 5000
-            onTriggered: statusText.visible = false
-        }
+        ColumnLayout {
+            width: parent.width
+            spacing: 20
 
-        // User info section
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 150
-            color: "#1a1a1a"
-            radius: 10
-            border.color: "#333333"
-            border.width: 2
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 10
+            // Status message
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 45
+                visible: statusMessage !== ""
+                color: "#151515"
+                radius: 8
+                border.color: statusColor
+                border.width: 2
 
                 Text {
-                    text: "Current User"
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#7cfc00"
+                    anchors.centerIn: parent
+                    text: statusMessage
+                    font.pixelSize: 13
+                    color: statusColor
                 }
 
-                Text {
-                    text: "Alias: " + userDataManager.currentUser
-                    font.pixelSize: 18
-                    color: "white"
+                Timer {
+                    id: statusTimer
+                    interval: 4000
+                    onTriggered: statusMessage = ""
                 }
+            }
+
+            // User profile card
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 140
+                color: "#151515"
+                radius: 12
+                border.color: "#2a2a2a"
+                border.width: 1
 
                 ColumnLayout {
-                    id: statsColumn
-                    spacing: 5
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 15
 
-                    function updateDisplay() {
-                        var s = userDataManager.getOverallStats()
-                        statsText.text = "Total Tests: " + s.totalTests +
-                                       " | Total Score: " + s.totalScore +
-                                       " | Average: " + (s.averageScore || 0).toFixed(2)
+                    Text {
+                        text: "User Profile"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "#6fda00"
+                    }
+
+                    RowLayout {
+                        spacing: 15
+
+                        Rectangle {
+                            width: 50
+                            height: 50
+                            radius: 25
+                            color: "#6fda00"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: userDataManager.currentUser.substring(0, 1).toUpperCase()
+                                font.pixelSize: 24
+                                font.bold: true
+                                color: "#000000"
+                            }
+                        }
+
+                        ColumnLayout {
+                            spacing: 5
+
+                            Text {
+                                text: userDataManager.currentUser
+                                font.pixelSize: 20
+                                font.bold: true
+                                color: "#ffffff"
+                            }
+
+                            Text {
+                                id: statsText
+                                font.pixelSize: 13
+                                color: "#888888"
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Backup & Restore card
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 220
+                color: "#151515"
+                radius: 12
+                border.color: "#2a2a2a"
+                border.width: 1
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 15
+
+                    Text {
+                        text: "Backup & Restore"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "#6fda00"
                     }
 
                     Text {
-                        id: statsText
-                        font.pixelSize: 14
-                        color: "#999999"
+                        Layout.fillWidth: true
+                        text: "Save your progress to a backup file or restore from a previous backup."
+                        font.pixelSize: 13
+                        color: "#cccccc"
+                        wrapMode: Text.WordWrap
                     }
 
-                    Component.onCompleted: updateDisplay()
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        Button {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 50
+
+                            background: Rectangle {
+                                color: parent.hovered ? "#7fea10" : "#6fda00"
+                                radius: 8
+                            }
+
+                            contentItem: ColumnLayout {
+                                spacing: 2
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "💾"
+                                    font.pixelSize: 16
+                                }
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Create Backup"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#000000"
+                                }
+                            }
+
+                            onClicked: saveFileDialog.open()
+                        }
+
+                        Button {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 50
+
+                            background: Rectangle {
+                                color: parent.hovered ? "#ff9933" : "#ff8800"
+                                radius: 8
+                            }
+
+                            contentItem: ColumnLayout {
+                                spacing: 2
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "📥"
+                                    font.pixelSize: 16
+                                }
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Restore Backup"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#000000"
+                                }
+                            }
+
+                            onClicked: openFileDialog.open()
+                        }
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: `Default location:\n${userDataManager.getDefaultBackupPath()}`
+                        font.pixelSize: 10
+                        color: "#666666"
+                        wrapMode: Text.Wrap
+                        elide: Text.ElideMiddle
+                    }
                 }
             }
-        }
 
-        // Backup section
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 250
-            color: "#1a1a1a"
-            radius: 10
-            border.color: "#333333"
-            border.width: 2
+            // Account actions card
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 130
+                color: "#151515"
+                radius: 12
+                border.color: "#2a2a2a"
+                border.width: 1
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 15
-
-                Text {
-                    text: "Backup & Restore"
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#7cfc00"
-                }
-
-                Text {
-                    text: "Create a backup of your progress to save all your test results and practice history."
-                    font.pixelSize: 14
-                    color: "#cccccc"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
                     spacing: 15
 
+                    Text {
+                        text: "Account"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "#6fda00"
+                    }
+
                     Button {
-                        text: "Create Backup"
-                        font.pixelSize: 16
-                        Layout.preferredWidth: 180
-                        Layout.preferredHeight: 50
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 45
 
                         background: Rectangle {
-                            color: parent.pressed ? "#5fb800" : "#7cfc00"
-                            radius: 5
+                            color: parent.hovered ? "#ff5555" : "#ff4444"
+                            radius: 8
                         }
 
                         contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: "black"
+                            text: "🚪 Logout"
+                            font.pixelSize: 14
+                            font.bold: true
+                            color: "#ffffff"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
 
-                        onClicked: {
-                            saveFileDialog.open()
-                        }
-                    }
-
-                    Button {
-                        text: "Restore Backup"
-                        font.pixelSize: 16
-                        Layout.preferredWidth: 180
-                        Layout.preferredHeight: 50
-
-                        background: Rectangle {
-                            color: parent.pressed ? "#cc8800" : "#ffaa00"
-                            radius: 5
-                        }
-
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: "black"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-
-                        onClicked: {
-                            openFileDialog.open()
-                        }
-                    }
-                }
-
-                Text {
-                    text: "Default backup location: " + userDataManager.getDefaultBackupPath()
-                    font.pixelSize: 11
-                    color: "#666666"
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                }
-            }
-        }
-
-        // Logout section
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 120
-            color: "#1a1a1a"
-            radius: 10
-            border.color: "#333333"
-            border.width: 2
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 15
-
-                Text {
-                    text: "Account Actions"
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#7cfc00"
-                }
-
-                Button {
-                    text: "Logout"
-                    font.pixelSize: 16
-                    Layout.preferredWidth: 150
-                    Layout.preferredHeight: 45
-
-                    background: Rectangle {
-                        color: parent.pressed ? "#cc0000" : "#ff3333"
-                        radius: 5
-                    }
-
-                    contentItem: Text {
-                        text: parent.text
-                        font: parent.font
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    onClicked: {
-                        logoutDialog.open()
+                        onClicked: logoutDialog.open()
                     }
                 }
             }
-        }
 
-        Item {
-            Layout.fillHeight: true
+            Item { Layout.fillHeight: true }
         }
     }
 
@@ -316,99 +362,181 @@ Rectangle {
         }
     }
 
-    // Logout confirmation dialog
+    // Logout dialog
     Dialog {
         id: logoutDialog
-        title: "Confirm Logout"
-        modal: true
         anchors.centerIn: parent
-        width: 400
+        width: 350
+        height: 180
+        modal: true
 
         background: Rectangle {
             color: "#1a1a1a"
-            border.color: "#444444"
+            radius: 12
+            border.color: "#ff4444"
             border.width: 2
-            radius: 10
         }
 
-        header: Rectangle {
-            width: parent.width
-            height: 60
-            color: "#2a2a2a"
-            radius: 10
+        header: Item {
+            height: 50
 
             Text {
                 anchors.centerIn: parent
                 text: "Confirm Logout"
-                font.pixelSize: 20
+                font.pixelSize: 18
                 font.bold: true
-                color: "white"
+                color: "#ffffff"
             }
         }
 
         contentItem: Text {
-            text: "Are you sure you want to logout?\nAll unsaved progress will be lost."
-            font.pixelSize: 16
-            color: "white"
+            text: "Are you sure you want to logout?\n\nAny unsaved progress will be kept."
+            font.pixelSize: 13
+            color: "#cccccc"
+            horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
 
-        standardButtons: Dialog.Yes | Dialog.No
+        footer: RowLayout {
+            spacing: 10
 
-        onAccepted: {
-            userDataManager.setCurrentUser("")
-            stackView.clear()
-            stackView.push("UserManager.qml", {
-                appsdata: Fn.appsdata,
-                stackView: stackView
-            })
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#353535" : "#2a2a2a"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Cancel"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: logoutDialog.close()
+            }
+
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#ff5555" : "#ff4444"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Logout"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    userDataManager.setCurrentUser("")
+                    stackView.clear()
+                    stackView.push("UserManager.qml", {
+                        appsdata: Fn.appsdata,
+                        stackView: stackView
+                    })
+                    logoutDialog.close()
+                }
+            }
         }
     }
 
     // Restore confirmation dialog
     Dialog {
         id: restoreDialog
-        title: "Confirm Restore"
-        modal: true
         anchors.centerIn: parent
-        width: 450
+        width: 350
+        height: 200
+        modal: true
 
         property string backupPath: ""
 
         background: Rectangle {
             color: "#1a1a1a"
-            border.color: "#444444"
+            radius: 12
+            border.color: "#ff8800"
             border.width: 2
-            radius: 10
         }
 
-        header: Rectangle {
-            width: parent.width
-            height: 60
-            color: "#2a2a2a"
-            radius: 10
+        header: Item {
+            height: 50
 
             Text {
                 anchors.centerIn: parent
                 text: "Confirm Restore"
-                font.pixelSize: 20
+                font.pixelSize: 18
                 font.bold: true
-                color: "white"
+                color: "#ffffff"
             }
         }
 
         contentItem: Text {
-            text: "Are you sure you want to restore from this backup?\nThis will replace your current user data."
-            font.pixelSize: 16
-            color: "white"
+            text: "Restore from this backup?\n\nThis will replace your current user data with the backup."
+            font.pixelSize: 13
+            color: "#cccccc"
+            horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
 
-        standardButtons: Dialog.Yes | Dialog.No
+        footer: RowLayout {
+            spacing: 10
 
-        onAccepted: {
-            if (userDataManager.restoreBackup(backupPath)) {
-                updateStats()
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#353535" : "#2a2a2a"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Cancel"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: restoreDialog.close()
+            }
+
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#ff9933" : "#ff8800"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Restore"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#000000"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    if (userDataManager.restoreBackup(restoreDialog.backupPath)) {
+                        updateStats()
+                    }
+                    restoreDialog.close()
+                }
             }
         }
     }

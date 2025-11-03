@@ -5,26 +5,28 @@ import QtQuick.Layouts 1.15
 Rectangle {
     id: root
     anchors.fill: parent
-    color: "#000000"
+    color: "#0a0a0a"
 
     required property StackView stackView
     required property var appsdata
 
     signal userSelected(string alias)
 
+    // Status message
+    property string statusMessage: ""
+    property string statusColor: "#6fda00"
+
     Connections {
         target: userDataManager
         function onSuccessMessage(message) {
-            statusText.text = message
-            statusText.color = "green"
-            statusText.visible = true
+            statusMessage = message
+            statusColor = "#6fda00"
             statusTimer.restart()
         }
 
         function onErrorOccurred(message) {
-            statusText.text = message
-            statusText.color = "red"
-            statusText.visible = true
+            statusMessage = message
+            statusColor = "#ff4444"
             statusTimer.restart()
         }
 
@@ -37,102 +39,121 @@ Rectangle {
         userDataManager.refreshUserList()
     }
 
+    // Main content
     ColumnLayout {
         anchors.centerIn: parent
         width: parent.width * 0.9
-        spacing: 20
+        spacing: 30
 
+        // App title
         Text {
+            Layout.alignment: Qt.AlignHCenter
             text: "MouselessQt"
             font.pixelSize: 48
             font.bold: true
-            color: "#7cfc00"
-            Layout.alignment: Qt.AlignHCenter
+            color: "#6fda00"
+            style: Text.Normal
         }
 
         Text {
-            text: "Select or Create User Profile"
-            font.pixelSize: 24
-            color: "white"
             Layout.alignment: Qt.AlignHCenter
+            text: "Master Keyboard Shortcuts"
+            font.pixelSize: 16
+            color: "#888888"
         }
 
         // Status message
-        Text {
-            id: statusText
-            text: ""
-            font.pixelSize: 16
-            color: "green"
-            Layout.alignment: Qt.AlignHCenter
-            visible: false
-        }
-
-        Timer {
-            id: statusTimer
-            interval: 3000
-            onTriggered: statusText.visible = false
-        }
-
-        // Create new user section
         Rectangle {
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 100
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: parent.width * 0.8
+            Layout.preferredHeight: 35
+            visible: statusMessage !== ""
             color: "#1a1a1a"
-            radius: 10
-            border.color: "#333333"
-            border.width: 2
+            radius: 8
+            border.color: statusColor
+            border.width: 1
+
+            Text {
+                anchors.centerIn: parent
+                text: statusMessage
+                font.pixelSize: 13
+                color: statusColor
+            }
+
+            Timer {
+                id: statusTimer
+                interval: 3000
+                onTriggered: statusMessage = ""
+            }
+        }
+
+        // Create new user card
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: parent.width * 0.8
+            Layout.preferredHeight: 100
+            color: "#151515"
+            radius: 12
+            border.color: "#2a2a2a"
+            border.width: 1
 
             RowLayout {
-                anchors.centerIn: parent
+                anchors.fill: parent
+                anchors.margins: 20
                 spacing: 15
 
                 Text {
                     text: "New User:"
-                    font.pixelSize: 18
-                    color: "white"
+                    font.pixelSize: 15
+                    font.bold: true
+                    color: "#ffffff"
                 }
 
                 Rectangle {
-                    width: 250
-                    height: 40
-                    color: "#2a2a2a"
-                    border.color: "#555555"
-                    border.width: 1
-                    radius: 5
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.color: newUserInput.activeFocus ? "#6fda00" : "#333333"
+                    border.width: 2
 
                     TextInput {
                         id: newUserInput
                         anchors.fill: parent
-                        anchors.margins: 10
-                        font.pixelSize: 16
-                        color: "white"
+                        anchors.margins: 12
+                        font.pixelSize: 15
+                        color: "#ffffff"
                         clip: true
                         selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
 
                         Text {
-                            text: "Enter alias..."
-                            font.pixelSize: 16
-                            color: "#666666"
-                            visible: !newUserInput.text && !newUserInput.activeFocus
                             anchors.verticalCenter: parent.verticalCenter
+                            text: "Enter username..."
+                            font.pixelSize: 15
+                            color: "#555555"
+                            visible: !newUserInput.text && !newUserInput.activeFocus
                         }
+
+                        Keys.onReturnPressed: createButton.clicked()
                     }
                 }
 
                 Button {
-                    text: "Create"
-                    font.pixelSize: 16
-                    font.bold: true
+                    id: createButton
+                    Layout.preferredWidth: 90
+                    Layout.preferredHeight: 45
 
                     background: Rectangle {
-                        color: parent.pressed ? "#5fb800" : "#7cfc00"
-                        radius: 5
+                        color: parent.hovered ? "#7fea10" : "#6fda00"
+                        radius: 8
                     }
 
                     contentItem: Text {
-                        text: parent.text
-                        font: parent.font
-                        color: "black"
+                        text: "Create"
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: "#000000"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -149,22 +170,32 @@ Rectangle {
             }
         }
 
-        // Existing users list
-        Text {
-            text: "Existing Users:"
-            font.pixelSize: 20
-            font.bold: true
-            color: "white"
-            Layout.topMargin: 10
+        // Divider
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: parent.width * 0.6
+            height: 1
+            color: "#2a2a2a"
         }
 
+        // Existing users header
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Select User"
+            font.pixelSize: 20
+            font.bold: true
+            color: "#ffffff"
+        }
+
+        // Users list
         Rectangle {
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 300
-            color: "#1a1a1a"
-            radius: 10
-            border.color: "#333333"
-            border.width: 2
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: parent.width * 0.8
+            Layout.preferredHeight: 280
+            color: "#151515"
+            radius: 12
+            border.color: "#2a2a2a"
+            border.width: 1
 
             ListView {
                 id: userListView
@@ -172,18 +203,24 @@ Rectangle {
                 anchors.margins: 10
                 spacing: 10
                 clip: true
-
                 model: userDataManager.availableUsers
 
                 delegate: Rectangle {
-                    width: userListView.width - 20
-                    height: 80
-                    color: mouseArea.containsMouse ? "#2a2a2a" : "#1f1f1f"
-                    radius: 8
-                    border.color: "#444444"
-                    border.width: 1
+                    width: userListView.width - 10
+                    height: 75
+                    color: mouseArea.containsMouse ? "#252525" : "#1a1a1a"
+                    radius: 10
+                    border.color: mouseArea.containsMouse ? "#6fda00" : "#333333"
+                    border.width: 2
 
                     property var userData: modelData
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
+                    Behavior on border.color {
+                        ColorAnimation { duration: 150 }
+                    }
 
                     MouseArea {
                         id: mouseArea
@@ -200,47 +237,59 @@ Rectangle {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.margins: 10
+                        anchors.margins: 15
                         spacing: 15
 
+                        // User icon
+                        Rectangle {
+                            Layout.preferredWidth: 45
+                            Layout.preferredHeight: 45
+                            radius: 22.5
+                            color: "#6fda00"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: userData.alias.substring(0, 1).toUpperCase()
+                                font.pixelSize: 20
+                                font.bold: true
+                                color: "#000000"
+                            }
+                        }
+
+                        // User info
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 5
 
                             Text {
                                 text: userData.alias
-                                font.pixelSize: 22
+                                font.pixelSize: 18
                                 font.bold: true
-                                color: "#7cfc00"
+                                color: "#ffffff"
                             }
 
                             Text {
-                                text: "Tests: " + userData.totalTests + " | Score: " + userData.totalScore
-                                font.pixelSize: 14
-                                color: "#999999"
-                            }
-
-                            Text {
-                                text: "Last active: " + new Date(userData.lastActive).toLocaleString()
+                                text: `Tests: ${userData.totalTests} · Score: ${userData.totalScore}`
                                 font.pixelSize: 12
-                                color: "#666666"
+                                color: "#888888"
                             }
                         }
 
+                        // Delete button
                         Button {
-                            text: "Delete"
-                            Layout.preferredWidth: 80
+                            Layout.preferredWidth: 65
                             Layout.preferredHeight: 35
 
                             background: Rectangle {
-                                color: parent.pressed ? "#cc0000" : "#ff3333"
-                                radius: 5
+                                color: parent.hovered ? "#ff5555" : "#ff4444"
+                                radius: 6
                             }
 
                             contentItem: Text {
-                                text: parent.text
-                                font.pixelSize: 14
-                                color: "white"
+                                text: "Delete"
+                                font.pixelSize: 11
+                                font.bold: true
+                                color: "#ffffff"
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -257,18 +306,20 @@ Rectangle {
                     policy: ScrollBar.AsNeeded
                     width: 8
                     contentItem: Rectangle {
-                        color: "#666666"
+                        color: "#6fda00"
                         radius: 4
                     }
                 }
             }
 
+            // Empty state
             Text {
                 visible: userListView.count === 0
-                text: "No users found. Create one above!"
-                font.pixelSize: 16
-                color: "#666666"
                 anchors.centerIn: parent
+                text: "No users yet.\nCreate one above to get started!"
+                font.pixelSize: 14
+                color: "#666666"
+                horizontalAlignment: Text.AlignHCenter
             }
         }
     }
@@ -276,47 +327,88 @@ Rectangle {
     // Delete confirmation dialog
     Dialog {
         id: deleteDialog
-        title: "Confirm Delete"
-        modal: true
         anchors.centerIn: parent
-        width: 400
+        width: 350
+        height: 180
+        modal: true
 
         property string userToDelete: ""
 
         background: Rectangle {
             color: "#1a1a1a"
-            border.color: "#444444"
+            radius: 12
+            border.color: "#ff4444"
             border.width: 2
-            radius: 10
         }
 
-        header: Rectangle {
-            width: parent.width
-            height: 60
-            color: "#2a2a2a"
-            radius: 10
+        header: Item {
+            height: 50
 
             Text {
                 anchors.centerIn: parent
                 text: "Confirm Delete"
-                font.pixelSize: 20
+                font.pixelSize: 18
                 font.bold: true
-                color: "white"
+                color: "#ffffff"
             }
         }
 
         contentItem: Text {
-            text: "Are you sure you want to delete user '" + deleteDialog.userToDelete + "'?\nThis action cannot be undone."
-            font.pixelSize: 16
-            color: "white"
+            text: `Delete user "${deleteDialog.userToDelete}"?\n\nThis action cannot be undone.`
+            font.pixelSize: 13
+            color: "#cccccc"
+            horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
 
-        standardButtons: Dialog.Yes | Dialog.No
+        footer: RowLayout {
+            spacing: 10
 
-        onAccepted: {
-            userDataManager.deleteUser(deleteDialog.userToDelete)
-            userDataManager.refreshUserList()
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#353535" : "#2a2a2a"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Cancel"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: deleteDialog.close()
+            }
+
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#ff5555" : "#ff4444"
+                    radius: 8
+                }
+
+                contentItem: Text {
+                    text: "Delete"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    userDataManager.deleteUser(deleteDialog.userToDelete)
+                    userDataManager.refreshUserList()
+                    deleteDialog.close()
+                }
+            }
         }
     }
 }

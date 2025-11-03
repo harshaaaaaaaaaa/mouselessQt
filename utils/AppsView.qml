@@ -3,59 +3,69 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 Rectangle {
-    id: tool
+    id: root
     anchors.fill: parent
-    color: "black"
+    color: "#0a0a0a"
 
     required property var appsdata
     required property StackView stackView
 
-    // Header with user info and settings
+    // Header bar
     Rectangle {
-        id: header
+        id: headerBar
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 60
-        color: "#1a1a1a"
-        border.color: "#333333"
-        border.width: 1
+        height: 65
+        color: "#111111"
 
-        Row {
+        RowLayout {
             anchors.fill: parent
-            anchors.margins: 10
+            anchors.margins: 15
             spacing: 15
 
-            Text {
-                text: "User: " + userDataManager.currentUser
-                font.pixelSize: 18
-                font.bold: true
-                color: "#7cfc00"
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Item {
-                width: parent.width - settingsButton.width - 150
-                height: parent.height
-            }
-
-            Button {
-                id: settingsButton
-                text: "⚙ Settings"
-                font.pixelSize: 16
-                anchors.verticalCenter: parent.verticalCenter
-                width: 120
+            // User avatar
+            Rectangle {
+                width: 40
                 height: 40
+                radius: 20
+                color: "#6fda00"
+
+                Text {
+                    anchors.centerIn: parent
+                    text: userDataManager.currentUser.substring(0, 1).toUpperCase()
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: "#000000"
+                }
+            }
+
+            Text {
+                text: userDataManager.currentUser
+                font.pixelSize: 16
+                font.bold: true
+                color: "#ffffff"
+            }
+
+            Item { Layout.fillWidth: true }
+
+            // Settings button
+            Button {
+                Layout.preferredWidth: 110
+                Layout.preferredHeight: 40
 
                 background: Rectangle {
-                    color: parent.pressed ? "#555555" : "#333333"
-                    radius: 5
+                    color: parent.hovered ? "#252525" : "#1a1a1a"
+                    radius: 8
+                    border.color: "#6fda00"
+                    border.width: 1
                 }
 
                 contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: "white"
+                    text: "⚙ Settings"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#6fda00"
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -69,73 +79,119 @@ Rectangle {
         }
     }
 
-    GridLayout {
-        id: gridLayout
-        columns: 2
-        anchors.top: header.bottom
+    // Main content
+    ColumnLayout {
+        anchors.top: headerBar.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.topMargin: 20
-        anchors.leftMargin: parent.width/10
+        anchors.margins: 20
+        spacing: 25
 
-        Repeater {
-            model: appsdata
-            delegate: AppDelegate {
-                appTitle: modelData.title
-                appIcon: modelData.appicon
-                Layout.preferredWidth: parent.width/3
-                Layout.preferredHeight: parent.height/3
-            }
+        // Title
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Choose an Application"
+            font.pixelSize: 24
+            font.bold: true
+            color: "#ffffff"
         }
-    }
 
-    component AppDelegate: Rectangle {
-        id: delegateRoot
-        property string appTitle
-        property string appIcon
+        // Apps grid
+        GridLayout {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            columns: 2
+            rowSpacing: 20
+            columnSpacing: 20
 
-        radius: 20
-        border.width: 2
-        border.color: "black"
-        color: "#808080"
+            Repeater {
+                model: appsdata
 
-            Image {
-                id:pic
-                source: delegateRoot.appIcon
-                width: parent.width/1.2
-                height: parent.height/1.5
-                anchors{
-                        left: parent.left
-                        leftMargin: 2
-                        top: parent.top
-                        topMargin: 10
+                Rectangle {
+                    Layout.preferredWidth: 160
+                    Layout.preferredHeight: 180
+                    color: mouseArea.containsMouse ? "#252525" : "#151515"
+                    radius: 16
+                    border.color: mouseArea.containsMouse ? "#6fda00" : "#2a2a2a"
+                    border.width: 2
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
                     }
-            }
+                    Behavior on border.color {
+                        ColorAnimation { duration: 150 }
+                    }
+                    Behavior on scale {
+                        NumberAnimation { duration: 100; easing.type: Easing.OutQuad }
+                    }
 
-            Text {
-                text: delegateRoot.appTitle
-                color: "white"
-                font { pixelSize: 16; bold: true }
-                anchors{
-                        top: pic.bottom
-                        topMargin: 10
-                        left: parent.left
-                        leftMargin: 20
+                    scale: mouseArea.pressed ? 0.95 : 1.0
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            stackView.push("CategoryView.qml", {
+                                appsdata: modelData,
+                                stackView: stackView
+                            })
+                        }
+                    }
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        spacing: 12
+
+                        // App icon
+                        Image {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 80
+                            Layout.preferredHeight: 80
+                            source: modelData.appicon
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                        }
+
+                        // App name
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            text: modelData.title
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: "#ffffff"
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                        }
+
+                        // Category badge
+                        Rectangle {
+                            Layout.alignment: Qt.AlignHCenter
+                            width: childText.width + 16
+                            height: 24
+                            radius: 12
+                            color: "#1a1a1a"
+                            border.color: "#6fda00"
+                            border.width: 1
+
+                            Text {
+                                id: childText
+                                anchors.centerIn: parent
+                                text: modelData.category || "App"
+                                font.pixelSize: 10
+                                font.bold: true
+                                color: "#6fda00"
+                            }
+                        }
+                    }
                 }
             }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                stackView.push("CategoryView.qml", {
-                    appsdata: modelData,
-                    stackView: stackView
-                })
-            }
         }
+
+        Item { Layout.fillHeight: true }
     }
 }
-
-
-

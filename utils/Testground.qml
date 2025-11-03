@@ -23,6 +23,11 @@ Page {
     property int count: 1
     property bool showHelp: false
 
+    // New navigation state
+    property int spaceCount: 0
+    property int lastSpaceTime: 0
+    property bool escPressed: false
+
     property var attemptedKeys: Array.from(
         {"length": appsdata.test.length},
         () => ({"keypressed":[], "color":[],"attempt": false,"correct": false})
@@ -316,16 +321,68 @@ Page {
         Keys.enabled: true
 
         Keys.onPressed: {
-            if (event.isAutoRepeat) return
+            if (event.isAutoRepeat) {
+                event.accepted = true  // Block IPC
+                return
+            }
 
-            // Space bar to skip (when idle, no conflicts)
-            if (event.key === Qt.Key_Space && currentStep === 0) {
-                skipRight()
+            // Track Esc key state
+            if (event.key === Qt.Key_Escape) {
+                escPressed = true
                 event.accepted = true
                 return
             }
 
-            // Process shortcut key press
+            // Handle Space key for navigation (only when idle)
+            if (event.key === Qt.Key_Space && currentStep === 0) {
+                var currentTime = Date.now()
+
+                // Reset space count if more than 800ms since last space
+                if (currentTime - lastSpaceTime > 800) {
+                    spaceCount = 0
+                }
+
+                spaceCount++
+                lastSpaceTime = currentTime
+
+                // Check if Esc is held for exit
+                if (escPressed) {
+                    // Esc+Space = Exit to Analysis
+                    saveSession()
+                    stackView.push("KeyAnalysis.qml", {
+                        attemptedKeys: attemptedKeys,
+                        appsdata: appsdata,
+                        stackView: stackView
+                    })
+                    event.accepted = true
+                    return
+                }
+
+                // Double Space = Skip forward
+                if (spaceCount === 2) {
+                    skipRight()
+                    spaceCount = 0
+                    event.accepted = true
+                    return
+                }
+
+                // Triple Space = Skip backward
+                if (spaceCount === 3) {
+                    skipLeft()
+                    spaceCount = 0
+                    event.accepted = true
+                    return
+                }
+
+                event.accepted = true
+                return
+            }
+
+            // Process shortcut key press (block Space if in sequence)
+            if (event.key === Qt.Key_Space && currentStep > 0) {
+                // Space is part of the shortcut, process normally
+            }
+
             const currentKey = expectedSequence[currentStep]
             var newColors = keyColors.slice()
             var newText = keyText.slice()
@@ -347,9 +404,19 @@ Page {
                 showResult(true)
                 nextShortcutTimer.start()
             }
+
+            // Block ALL keys from reaching OS (IPC block)
+            event.accepted = true
         }
 
         Keys.onReleased: {
+            // Reset Esc state
+            if (event.key === Qt.Key_Escape) {
+                escPressed = false
+                event.accepted = true
+                return
+            }
+
             const releasedKey = Object.keys(activeKeys).find(key =>
                 (key === "Ctrl" && !(event.modifiers & Qt.ControlModifier)) ||
                 (key === "Shift" && !(event.modifiers & Qt.ShiftModifier)) ||
@@ -372,6 +439,9 @@ Page {
                 currentStep = 0
                 resetSequence()
             }
+
+            // Block ALL keys from reaching OS (IPC block)
+            event.accepted = true
         }
 
         // Centered content
@@ -531,7 +601,7 @@ Page {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Press SPACE to skip"
+                text: "Double SPACE to skip • Triple SPACE for previous • ESC+SPACE to exit"
                 font.pixelSize: 11
                 color: "#888888"
             }
@@ -554,7 +624,7 @@ Page {
                     }
 
                     contentItem: Text {
-                        text: "Skip (Space)"
+                        text: "Skip (2× Space)"
                         font.pixelSize: 12
                         font.bold: true
                         color: parent.parent.enabled ? "#ffffff" : "#666644"
@@ -681,7 +751,17 @@ Page {
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  SPACE - Skip question (safe!)"
+                            text: "  Double SPACE - Skip to next question"
+                            font.pixelSize: 13
+                            color: "#cccccc"
+                        }
+                        Text {
+                            text: "  Triple SPACE - Go to previous question"
+                            font.pixelSize: 13
+                            color: "#cccccc"
+                        }
+                        Text {
+                            text: "  ESC+SPACE - Exit and view analysis"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }

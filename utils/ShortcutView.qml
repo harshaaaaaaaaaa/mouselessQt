@@ -19,9 +19,40 @@ Page {
     property var keyColors: []
     property int count: 1
 
+    // New navigation state
+    property int spaceCount: 0
+    property int lastSpaceTime: 0
+    property bool escPressed: false
+
     Component.onCompleted: {
+        loadSession()
         resetSequence()
         keyHandler.forceActiveFocus()
+    }
+
+    Component.onDestruction: {
+        saveSession()
+    }
+
+    function loadSession() {
+        if (userDataManager.currentUser !== "") {
+            var session = userDataManager.loadSessionState(appsdata.id || "unknown", "learn")
+            if (session && session.currentIndex !== undefined) {
+                currentIndex = session.currentIndex || 0
+                count = session.count || 1
+            }
+        }
+    }
+
+    function saveSession() {
+        if (userDataManager.currentUser !== "") {
+            var sessionData = {
+                "currentIndex": currentIndex,
+                "count": count,
+                "timestamp": new Date().toISOString()
+            }
+            userDataManager.saveSessionState(appsdata.id || "unknown", "learn", sessionData)
+        }
     }
 
     function resetSequence() {
@@ -178,10 +209,18 @@ Page {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "Practice Mode"
+                text: "Learn Mode - Keys Visible!"
                 font.pixelSize: 14
                 font.bold: true
                 color: "#6fda00"
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Text {
+                text: "2× Space: skip • 3× Space: prev • Esc+Space: exit"
+                font.pixelSize: 10
+                color: "#888888"
             }
         }
     }
@@ -198,56 +237,94 @@ Page {
         Keys.enabled: true
 
         Keys.onPressed: {
-            if (event.isAutoRepeat) return
+            if (event.isAutoRepeat) {
+                event.accepted = true  // Block IPC
+                return
+            }
 
-            // Esc to exit
+            // Track Esc key state
             if (event.key === Qt.Key_Escape) {
-                if (stackView) stackView.pop()
+                escPressed = true
                 event.accepted = true
                 return
             }
 
-            // Alt+navigation (no conflicts)
-            if (currentStep == 0) {
-                if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Right) {
+            // Handle Space key for navigation (only when idle)
+            if (event.key === Qt.Key_Space && currentStep === 0) {
+                var currentTime = Date.now()
+
+                // Reset space count if more than 800ms since last space
+                if (currentTime - lastSpaceTime > 800) {
+                    spaceCount = 0
+                }
+
+                spaceCount++
+                lastSpaceTime = currentTime
+
+                // Check if Esc is held for exit
+                if (escPressed) {
+                    // Esc+Space = Exit to Categories (save session)
+                    saveSession()
+                    stackView.pop()  // Go back to CategoryView
+                    event.accepted = true
+                    return
+                }
+
+                // Double Space = Skip forward
+                if (spaceCount === 2) {
                     skipRight()
+                    spaceCount = 0
                     event.accepted = true
                     return
-                } else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_Left) {
+                }
+
+                // Triple Space = Skip backward
+                if (spaceCount === 3) {
                     skipLeft()
+                    spaceCount = 0
                     event.accepted = true
                     return
                 }
+
+                event.accepted = true
+                return
             }
 
-            // Arrow navigation
-            if (event.key === Qt.Key_Right && currentStep == 0) {
-                skipRight()
-            } else if (event.key === Qt.Key_Left && currentStep == 0) {
-                skipLeft()
-            } else {
-                const currentKey = expectedSequence[currentStep]
-                var newColors = keyColors.slice()
-                newColors[currentStep] = checkKeyPress(event) ? "green" : "red"
-                keyColors = newColors
-                activeKeys[currentKey] = true
-                currentStep++
+            // Process shortcut key press (allow Space if in sequence)
+            if (event.key === Qt.Key_Space && currentStep > 0) {
+                // Space is part of the shortcut, process normally
+            }
 
-                if (currentStep === expectedSequence.length) {
-                    var isallkeys = keyColors.includes("red")
-                    if (!isallkeys) {
-                        showResult(true)
-                        nextShortcutTimer.start()
-                    } else {
-                        showResult(false)
-                        resetTimer.start()
-                    }
-                    event.accepted = true
+            const currentKey = expectedSequence[currentStep]
+            var newColors = keyColors.slice()
+            newColors[currentStep] = checkKeyPress(event) ? "green" : "red"
+            keyColors = newColors
+            activeKeys[currentKey] = true
+            currentStep++
+
+            if (currentStep === expectedSequence.length) {
+                var isallkeys = keyColors.includes("red")
+                if (!isallkeys) {
+                    showResult(true)
+                    nextShortcutTimer.start()
+                } else {
+                    showResult(false)
+                    resetTimer.start()
                 }
             }
+
+            // Block ALL keys from reaching OS (IPC block)
+            event.accepted = true
         }
 
         Keys.onReleased: {
+            // Reset Esc state
+            if (event.key === Qt.Key_Escape) {
+                escPressed = false
+                event.accepted = true
+                return
+            }
+
             const releasedKey = Object.keys(activeKeys).find(key =>
                 (key === "Ctrl" && !(event.modifiers & Qt.ControlModifier)) ||
                 (key === "Shift" && !(event.modifiers & Qt.ShiftModifier)) ||
@@ -255,8 +332,8 @@ Page {
                 (key === "Enter" && (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)) ||
                 (event.key === key.charCodeAt(0)))
 
-            if ((event.key === Qt.Key_Right || event.key === Qt.Key_Left) && currentStep == 0) {
-                resetSequence()
+            if (event.key === Qt.Key_Space && currentStep == 0) {
+                // Space was used to skip, do nothing
             } else if (!releasedKey && currentStep === expectedSequence.length) {
                 delete activeKeys[releasedKey]
             } else if (releasedKey) {
@@ -268,6 +345,9 @@ Page {
                 delete activeKeys[releasedKey]
                 resetSequence()
             }
+
+            // Block ALL keys from reaching OS (IPC block)
+            event.accepted = true
         }
 
         ColumnLayout {

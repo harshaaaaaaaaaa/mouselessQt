@@ -25,8 +25,13 @@ Page {
 
     // New navigation state
     property int spaceCount: 0
-    property int lastSpaceTime: 0
     property bool escPressed: false
+
+    // Debug mode properties
+    property bool debugMode: true  // Set to false in production
+    property string lastKeyPressed: ""
+    property int lastKeyCode: 0
+    property string debugInfo: ""
 
     property var attemptedKeys: Array.from(
         {"length": appsdata.test.length},
@@ -321,33 +326,37 @@ Page {
         Keys.enabled: true
 
         Keys.onPressed: {
+            // Update debug info
+            lastKeyCode = event.key
+            lastKeyPressed = keyEventToString(event)
+            debugInfo = "Key pressed: " + lastKeyPressed + " (Code: " + lastKeyCode + ")"
+
             if (event.isAutoRepeat) {
                 event.accepted = true  // Block IPC
+                debugInfo += " [AUTO-REPEAT BLOCKED]"
                 return
             }
 
             // Track Esc key state
             if (event.key === Qt.Key_Escape) {
                 escPressed = true
+                debugInfo = "Esc pressed and held"
                 event.accepted = true
                 return
             }
 
             // Handle Space key for navigation (only when idle)
             if (event.key === Qt.Key_Space && currentStep === 0) {
-                var currentTime = Date.now()
-
-                // Reset space count if more than 800ms since last space
-                if (currentTime - lastSpaceTime > 800) {
-                    spaceCount = 0
-                }
-
+                // Restart timer on each space press
+                spaceResetTimer.restart()
                 spaceCount++
-                lastSpaceTime = currentTime
+
+                debugInfo = "Space pressed! Count: " + spaceCount + ", Esc: " + escPressed
 
                 // Check if Esc is held for exit
                 if (escPressed) {
                     // Esc+Space = Exit to Analysis
+                    debugInfo = "ESC+SPACE detected! Exiting to Analysis..."
                     saveSession()
                     stackView.push("KeyAnalysis.qml", {
                         attemptedKeys: attemptedKeys,
@@ -360,16 +369,20 @@ Page {
 
                 // Double Space = Skip forward
                 if (spaceCount === 2) {
+                    debugInfo = "Double Space! Skipping forward..."
                     skipRight()
                     spaceCount = 0
+                    spaceResetTimer.stop()
                     event.accepted = true
                     return
                 }
 
                 // Triple Space = Skip backward
                 if (spaceCount === 3) {
+                    debugInfo = "Triple Space! Going back..."
                     skipLeft()
                     spaceCount = 0
+                    spaceResetTimer.stop()
                     event.accepted = true
                     return
                 }
@@ -378,16 +391,19 @@ Page {
                 return
             }
 
-            // Process shortcut key press (block Space if in sequence)
-            if (event.key === Qt.Key_Space && currentStep > 0) {
-                // Space is part of the shortcut, process normally
+            // Process shortcut key press (Space is part of the shortcut)
+            if (currentStep > 0 && event.key === Qt.Key_Space) {
+                debugInfo = "Space is part of shortcut, processing normally..."
             }
 
             const currentKey = expectedSequence[currentStep]
             var newColors = keyColors.slice()
             var newText = keyText.slice()
             newText[currentStep] = keyEventToString(event)
-            newColors[currentStep] = checkKeyPress(event) ? "green" : "red"
+            var isCorrect = checkKeyPress(event)
+            newColors[currentStep] = isCorrect ? "green" : "red"
+
+            debugInfo = "Expected: " + currentKey + ", Got: " + newText[currentStep] + " → " + (isCorrect ? "✓" : "✗")
 
             keyColors = newColors
             keyText = newText
@@ -401,6 +417,7 @@ Page {
                 attemptedKeys[currentIndex].keypressed = keyText
                 attemptedKeys[currentIndex].color = keyColors
 
+                debugInfo = "Sequence complete! " + (isallkeys ? "WRONG" : "CORRECT")
                 showResult(true)
                 nextShortcutTimer.start()
             }
@@ -410,9 +427,12 @@ Page {
         }
 
         Keys.onReleased: {
+            debugInfo = "Key released: " + keyEventToString(event)
+
             // Reset Esc state
             if (event.key === Qt.Key_Escape) {
                 escPressed = false
+                debugInfo = "Esc released"
                 event.accepted = true
                 return
             }
@@ -426,11 +446,14 @@ Page {
 
             if (event.key === Qt.Key_Space && currentStep == 0) {
                 // Space was used to skip, do nothing
+                debugInfo = "Space released (used for navigation)"
             } else if (!releasedKey && currentStep === expectedSequence.length) {
                 delete activeKeys[releasedKey]
+                debugInfo = "Key released after sequence complete"
             } else if (releasedKey) {
                 delete activeKeys[releasedKey]
                 if (currentStep > 0 && currentStep < expectedSequence.length) {
+                    debugInfo = "Early release! Resetting sequence..."
                     currentStep = 0
                     resetSequence()
                 }
@@ -438,6 +461,7 @@ Page {
                 delete activeKeys[releasedKey]
                 currentStep = 0
                 resetSequence()
+                debugInfo = "Unknown key released, resetting"
             }
 
             // Block ALL keys from reaching OS (IPC block)
@@ -828,5 +852,115 @@ Page {
         id: nextShortcutTimer
         interval: 1000
         onTriggered: advanceShortcut()
+    }
+
+    // Timer to reset space count after 500ms
+    Timer {
+        id: spaceResetTimer
+        interval: 500
+        onTriggered: {
+            spaceCount = 0
+            debugInfo = "Space count reset"
+        }
+    }
+
+    // Debug overlay (only shown if debugMode is true)
+    Rectangle {
+        visible: debugMode
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 10
+        anchors.topMargin: 60
+        width: 300
+        height: 250
+        color: "#dd000000"
+        radius: 8
+        border.color: "#00ff00"
+        border.width: 2
+        z: 999
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 5
+
+            Text {
+                text: "🔧 DEBUG MODE"
+                font.pixelSize: 14
+                font.bold: true
+                color: "#00ff00"
+            }
+
+            Rectangle { Layout.fillWidth: true; height: 1; color: "#333333" }
+
+            Text {
+                text: "Last Key: " + lastKeyPressed
+                font.pixelSize: 11
+                color: "#ffffff"
+            }
+            Text {
+                text: "Key Code: " + lastKeyCode
+                font.pixelSize: 11
+                color: "#ffffff"
+            }
+            Text {
+                text: "Space Count: " + spaceCount
+                font.pixelSize: 11
+                color: "#ffff00"
+            }
+            Text {
+                text: "Esc Pressed: " + (escPressed ? "YES" : "NO")
+                font.pixelSize: 11
+                color: escPressed ? "#ff0000" : "#888888"
+            }
+            Text {
+                text: "Current Step: " + currentStep + "/" + expectedSequence.length
+                font.pixelSize: 11
+                color: "#ffffff"
+            }
+            Text {
+                text: "Expected Key: " + (currentStep < expectedSequence.length ? expectedSequence[currentStep] : "N/A")
+                font.pixelSize: 11
+                color: "#00ffff"
+            }
+            Text {
+                text: "Question: " + (currentIndex + 1) + "/" + appsdata.test.length
+                font.pixelSize: 11
+                color: "#ffffff"
+            }
+
+            Rectangle { Layout.fillWidth: true; height: 1; color: "#333333" }
+
+            Text {
+                text: debugInfo
+                font.pixelSize: 10
+                color: "#888888"
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            Item { Layout.fillHeight: true }
+
+            Button {
+                Layout.preferredWidth: 120
+                Layout.preferredHeight: 25
+
+                background: Rectangle {
+                    color: parent.hovered ? "#ff3333" : "#cc0000"
+                    radius: 4
+                }
+
+                contentItem: Text {
+                    text: "Hide Debug"
+                    font.pixelSize: 10
+                    font.bold: true
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: debugMode = false
+            }
+        }
     }
 }

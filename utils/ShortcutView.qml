@@ -126,14 +126,16 @@ Page {
         const currentKey = expectedSequence[currentStep]
         let keyMatch = false
 
+        // For modifier keys, check the actual key pressed, not the modifiers bitmask
+        // This ensures "Ctrl+Shift+X" is different from "Shift+Ctrl+X"
         if (currentKey === "Ctrl") {
-            keyMatch = event.modifiers & Qt.ControlModifier
+            keyMatch = (event.key === Qt.Key_Control)
         } else if (currentKey === "Shift") {
-            keyMatch = event.modifiers & Qt.ShiftModifier
+            keyMatch = (event.key === Qt.Key_Shift)
         } else if (currentKey === "Enter") {
             keyMatch = (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
         } else if (currentKey === "Alt") {
-            keyMatch = event.modifiers & Qt.AltModifier
+            keyMatch = (event.key === Qt.Key_Alt)
         } else if (currentKey === "PageDown") {
             keyMatch = event.key === Qt.Key_PageDown
         } else if (currentKey === "PageUp") {
@@ -547,8 +549,13 @@ Page {
         id: resetTimer
         interval: 1000
         onTriggered: {
-            // Advance to next shortcut even on wrong answer (for learning)
-            advanceShortcut()
+            // Reset and stay on same shortcut (don't advance on wrong)
+            currentStep = 0
+            activeKeys = {}
+            keyColors = new Array(appsdata.shortcuts[currentIndex].keys.length).fill("white")
+            expectedSequence = appsdata.shortcuts[currentIndex].keys
+            resultDisplay.opacity = 0
+            keyHandler.forceActiveFocus()  // Restore focus
         }
     }
 
@@ -573,6 +580,7 @@ Page {
                 debugInfo = "Left arrow held 2s! Going back..."
                 skipLeft()
                 leftArrowHeld = false
+                keyHandler.forceActiveFocus()  // Restore focus after navigation
             }
         }
     }
@@ -586,6 +594,7 @@ Page {
                 debugInfo = "Right arrow held 2s! Skipping forward..."
                 skipRight()
                 rightArrowHeld = false
+                keyHandler.forceActiveFocus()  // Restore focus after navigation
             }
         }
     }

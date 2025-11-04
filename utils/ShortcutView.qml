@@ -21,8 +21,9 @@ Page {
     property int count: 1
 
     // New navigation state
-    property int spaceCount: 0
     property bool escPressed: false
+    property bool leftArrowHeld: false
+    property bool rightArrowHeld: false
 
     // Debug mode properties
     property bool debugMode: true  // Set to false in production
@@ -283,7 +284,7 @@ Page {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "2× Space: skip • 3× Space: prev • Esc+Space: exit"
+                text: "Hold → 2s: skip • Hold ← 2s: prev • Esc+Space: exit"
                 font.pixelSize: 10
                 color: "#888888"
             }
@@ -321,51 +322,39 @@ Page {
                 return
             }
 
-            // Handle Space key for navigation (only when idle AND Space is not expected)
-            if (event.key === Qt.Key_Space && currentStep === 0 && expectedSequence[0] !== "Space") {
-                // Restart timer on each space press
-                spaceResetTimer.restart()
-                spaceCount++
-
-                debugInfo = "Space pressed! Count: " + spaceCount + ", Esc: " + escPressed
-
-                // Check if Esc is held for exit
-                if (escPressed) {
-                    // Esc+Space = Exit to Categories (save session)
-                    debugInfo = "ESC+SPACE detected! Exiting to Categories..."
-                    saveSession()
-                    stackView.pop()  // Go back to CategoryView
-                    event.accepted = true
-                    return
-                }
-
-                // Double Space = Skip forward
-                if (spaceCount === 2) {
-                    debugInfo = "Double Space! Skipping forward..."
-                    skipRight()
-                    spaceCount = 0
-                    spaceResetTimer.stop()
-                    event.accepted = true
-                    return
-                }
-
-                // Triple Space = Skip backward
-                if (spaceCount === 3) {
-                    debugInfo = "Triple Space! Going back..."
-                    skipLeft()
-                    spaceCount = 0
-                    spaceResetTimer.stop()
-                    event.accepted = true
-                    return
-                }
-
+            // Handle Space key for Esc+Space exit only
+            if (event.key === Qt.Key_Space && escPressed) {
+                // Esc+Space = Exit to Categories (save session)
+                debugInfo = "ESC+SPACE detected! Exiting to Categories..."
+                saveSession()
+                stackView.pop()  // Go back to CategoryView
                 event.accepted = true
                 return
             }
 
-            // Process shortcut key press
-            if (event.key === Qt.Key_Space) {
-                debugInfo = "Space is part of shortcut, processing normally..."
+            // Handle arrow key navigation (only when idle and no modifiers)
+            if (currentStep === 0) {
+                var hasModifiers = (event.modifiers & Qt.ControlModifier) ||
+                                   (event.modifiers & Qt.AltModifier) ||
+                                   (event.modifiers & Qt.ShiftModifier)
+
+                // Left arrow - hold for 2 seconds to go back
+                if (event.key === Qt.Key_Left && !hasModifiers) {
+                    leftArrowHeld = true
+                    leftArrowTimer.restart()
+                    debugInfo = "Left arrow pressed (hold 2s to go back)..."
+                    event.accepted = true
+                    return
+                }
+
+                // Right arrow - hold for 2 seconds to skip forward
+                if (event.key === Qt.Key_Right && !hasModifiers) {
+                    rightArrowHeld = true
+                    rightArrowTimer.restart()
+                    debugInfo = "Right arrow pressed (hold 2s to skip)..."
+                    event.accepted = true
+                    return
+                }
             }
 
             const currentKey = expectedSequence[currentStep]
@@ -407,6 +396,23 @@ Page {
                 return
             }
 
+            // Cancel arrow key navigation if released early
+            if (event.key === Qt.Key_Left && leftArrowHeld) {
+                leftArrowHeld = false
+                leftArrowTimer.stop()
+                debugInfo = "Left arrow released (cancelled navigation)"
+                event.accepted = true
+                return
+            }
+
+            if (event.key === Qt.Key_Right && rightArrowHeld) {
+                rightArrowHeld = false
+                rightArrowTimer.stop()
+                debugInfo = "Right arrow released (cancelled navigation)"
+                event.accepted = true
+                return
+            }
+
             const releasedKey = Object.keys(activeKeys).find(key =>
                 (key === "Ctrl" && !(event.modifiers & Qt.ControlModifier)) ||
                 (key === "Shift" && !(event.modifiers & Qt.ShiftModifier)) ||
@@ -414,10 +420,7 @@ Page {
                 (key === "Enter" && (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)) ||
                 (event.key === key.charCodeAt(0)))
 
-            if (event.key === Qt.Key_Space && currentStep == 0) {
-                // Space was used to skip, do nothing
-                debugInfo = "Space released (used for navigation)"
-            } else if (!releasedKey && currentStep === expectedSequence.length) {
+            if (!releasedKey && currentStep === expectedSequence.length) {
                 delete activeKeys[releasedKey]
                 debugInfo = "Key released after sequence complete"
             } else if (releasedKey) {
@@ -565,13 +568,29 @@ Page {
         onTriggered: resultDisplay.opacity = 0
     }
 
-    // Timer to reset space count after 500ms
+    // Timer for left arrow hold (2 seconds)
     Timer {
-        id: spaceResetTimer
-        interval: 500
+        id: leftArrowTimer
+        interval: 2000
         onTriggered: {
-            spaceCount = 0
-            debugInfo = "Space count reset"
+            if (leftArrowHeld && currentStep === 0) {
+                debugInfo = "Left arrow held 2s! Going back..."
+                skipLeft()
+                leftArrowHeld = false
+            }
+        }
+    }
+
+    // Timer for right arrow hold (2 seconds)
+    Timer {
+        id: rightArrowTimer
+        interval: 2000
+        onTriggered: {
+            if (rightArrowHeld && currentStep === 0) {
+                debugInfo = "Right arrow held 2s! Skipping forward..."
+                skipRight()
+                rightArrowHeld = false
+            }
         }
     }
 
@@ -615,9 +634,14 @@ Page {
                 color: "#ffffff"
             }
             Text {
-                text: "Space Count: " + spaceCount
+                text: "Left Arrow: " + (leftArrowHeld ? "HELD" : "Released")
                 font.pixelSize: 11
-                color: "#ffff00"
+                color: leftArrowHeld ? "#ffff00" : "#888888"
+            }
+            Text {
+                text: "Right Arrow: " + (rightArrowHeld ? "HELD" : "Released")
+                font.pixelSize: 11
+                color: rightArrowHeld ? "#ffff00" : "#888888"
             }
             Text {
                 text: "Esc Pressed: " + (escPressed ? "YES" : "NO")

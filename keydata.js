@@ -37,7 +37,7 @@ var appsdata=[
         },
         {
           title: 'Scroll Page Down',
-          keys: ['Ctrl', 'Arrowdown'],
+          keys: ['Ctrl', 'down'],
         },
         {
           title: 'Scroll Page Up',
@@ -72,11 +72,11 @@ var appsdata=[
         },
         {
           title: 'Expand AST Selection',
-          keys: ['Ctrl', 'Shift', 'Ctrl', 'ArrowRight'],
+          keys: ['Ctrl', 'Shift', 'Ctrl', 'right'],
         },
         {
           title: 'Shrink AST Selection',
-          keys: ['Ctrl', 'Shift', 'Ctrl', 'ArrowLeft'],
+          keys: ['Ctrl', 'Shift', 'Ctrl', 'left'],
         },
       ],
     },
@@ -107,19 +107,19 @@ var appsdata=[
         },
         {
           title: 'Move Line Down',
-          keys: ['Alt', 'ArrowDown'],
+          keys: ['Alt', 'down'],
         },
         {
           title: 'Move Line Up',
-          keys: ['Alt', 'ArrowUp'],
+          keys: ['Alt', 'up'],
         },
         {
           title: 'Copy Line Down',
-          keys: ['Shift', 'Alt', 'ArrowDown'],
+          keys: ['Shift', 'Alt', 'down'],
         },
         {
           title: 'Copy Line Up',
-          keys: ['Shift', 'Alt', 'ArrowUp'],
+          keys: ['Shift', 'Alt', 'up'],
         },
         {
           title: 'Indent Line',
@@ -150,11 +150,11 @@ var appsdata=[
         },
         {
           title: 'Insert Cursor Below',
-          keys: ['Alt', 'Ctrl', 'ArrowDown'],
+          keys: ['Alt', 'Ctrl', 'down'],
         },
         {
           title: 'Insert Cursor Above',
-          keys: ['Alt', 'Ctrl', 'ArrowUp'],
+          keys: ['Alt', 'Ctrl', 'up'],
         },
       ],
     },
@@ -256,11 +256,11 @@ var appsdata=[
         },
         {
           title: 'Go to End of File',
-          keys: ['Ctrl', 'ArrowDown'],
+          keys: ['Ctrl', 'down'],
         },
         {
           title: 'Go to Beginning of File',
-          keys: ['Ctrl', 'ArrowUp'],
+          keys: ['Ctrl', 'up'],
         },
       ],
     },
@@ -299,11 +299,11 @@ var appsdata=[
         },
         {
           title: 'Move Editor into Next Group',
-          keys: ['Ctrl', 'Ctrl', 'ArrowRight'],
+          keys: ['Ctrl', 'Ctrl', 'right'],
         },
         {
           title: 'Move Editor into Previous Group',
-          keys: ['Ctrl', 'Ctrl', 'ArrowLeft'],
+          keys: ['Ctrl', 'Ctrl', 'left'],
         },
       ],
     },
@@ -455,11 +455,11 @@ var appsdata=[
         },
         {
           title: 'Show Next Search Term',
-          keys: ['ArrowDown'],
+          keys: ['down'],
         },
         {
           title: 'Show Previous Search Term',
-          keys: ['ArrowUp'],
+          keys: ['up'],
         },
       ],
     },
@@ -605,11 +605,11 @@ var appsdata=[
         },
         {
           title: 'Expand AST Selection',
-          keys: ['Ctrl', 'Shift', 'Ctrl', 'ArrowRight'],
+          keys: ['Ctrl', 'Shift', 'Ctrl', 'right'],
         },
         {
           title: 'Shrink AST Selection',
-          keys: ['Ctrl', 'Shift', 'Ctrl', 'ArrowLeft'],
+          keys: ['Ctrl', 'Shift', 'Ctrl', 'left'],
         },
         {
           title: 'Cut line (empty selection)',
@@ -633,19 +633,19 @@ var appsdata=[
         },
         {
           title: 'Move Line Down',
-          keys: ['Alt', 'ArrowDown'],
+          keys: ['Alt', 'down'],
         },
         {
           title: 'Move Line Up',
-          keys: ['Alt', 'ArrowUp'],
+          keys: ['Alt', 'up'],
         },
         {
           title: 'Copy Line Down',
-          keys: ['Shift', 'Alt', 'ArrowDown'],
+          keys: ['Shift', 'Alt', 'down'],
         },
         {
           title: 'Copy Line Up',
-          keys: ['Shift', 'Alt', 'ArrowUp'],
+          keys: ['Shift', 'Alt', 'up'],
         },
         {
           title: 'Indent Line',
@@ -669,11 +669,11 @@ var appsdata=[
         },
         {
           title: 'Insert Cursor Below',
-          keys: ['Alt', 'Ctrl', 'ArrowDown'],
+          keys: ['Alt', 'Ctrl', 'down'],
         },
         {
           title: 'Insert Cursor Above',
-          keys: ['Alt', 'Ctrl', 'ArrowUp'],
+          keys: ['Alt', 'Ctrl', 'up'],
         },
         {
           title: 'Trigger Suggest',
@@ -761,11 +761,11 @@ var appsdata=[
         },
         {
           title: 'Go to End of File',
-          keys: ['Ctrl', 'ArrowDown'],
+          keys: ['Ctrl', 'down'],
         },
         {
           title: 'Go to Beginning of File',
-          keys: ['Ctrl', 'ArrowUp'],
+          keys: ['Ctrl', 'up'],
         },
         {
           title: 'New Window',
@@ -797,11 +797,11 @@ var appsdata=[
         },
         {
           title: 'Move Editor into Next Group',
-          keys: ['Ctrl', 'Ctrl', 'ArrowRight'],
+          keys: ['Ctrl', 'Ctrl', 'right'],
         },
         {
           title: 'Move Editor into Previous Group',
-          keys: ['Ctrl', 'Ctrl', 'ArrowLeft'],
+          keys: ['Ctrl', 'Ctrl', 'left'],
         },
         {
           title: 'New File',
@@ -929,11 +929,11 @@ var appsdata=[
         },
         {
           title: 'Show Next Search Term',
-          keys: ['ArrowDown'],
+          keys: ['down'],
         },
         {
           title: 'Show Previous Search Term',
-          keys: ['ArrowUp'],
+          keys: ['up'],
         },
         {
           title: 'Toggle Breakpoint',
@@ -1178,19 +1178,19 @@ var appsdata=[
                 shortcuts: [
                   {
                     title: 'Select parent element',
-                    keys: ['ArrowUp'],
+                    keys: ['up'],
                   },
                   {
                     title: 'Select child element',
-                    keys: ['ArrowDown'],
+                    keys: ['down'],
                   },
                   {
                     title: 'Select next element',
-                    keys: ['Alt', 'ArrowRight'],
+                    keys: ['Alt', 'right'],
                   },
                   {
                     title: 'Select previous element',
-                    keys: ['Alt', 'ArrowLeft'],
+                    keys: ['Alt', 'left'],
                   },
                   {
                     title: 'Toggle Collaborators on selected element',
@@ -1334,19 +1334,19 @@ var appsdata=[
               },
               {
                 title: 'Select parent element',
-                keys: ['ArrowUp'],
+                keys: ['up'],
               },
               {
                 title: 'Select child element',
-                keys: ['ArrowDown'],
+                keys: ['down'],
               },
               {
                 title: 'Select next element',
-                keys: ['Alt', 'ArrowRight'],
+                keys: ['Alt', 'right'],
               },
               {
                 title: 'Select previous element',
-                keys: ['Alt', 'ArrowLeft'],
+                keys: ['Alt', 'left'],
               },
               {
                 title: 'Toggle Collaborators on selected element',
@@ -1373,11 +1373,11 @@ var appsdata=[
                 shortcuts: [
                   {
                     title: 'Back',
-                    keys: ['Ctrl', 'ArrowLeft'],
+                    keys: ['Ctrl', 'left'],
                   },
                   {
                     title: 'Forward',
-                    keys: ['Ctrl', 'ArrowRight'],
+                    keys: ['Ctrl', 'right'],
                   },
                   {
                     title: 'Open File',
@@ -1420,11 +1420,11 @@ var appsdata=[
                   },
                   {
                     title: 'Go to Bottom of Page',
-                    keys: ['Ctrl', 'ArrowDown'],
+                    keys: ['Ctrl', 'down'],
                   },
                   {
                     title: 'Go to Top of Page',
-                    keys: ['Ctrl', 'ArrowUp'],
+                    keys: ['Ctrl', 'up'],
                   },
                   {
                     title: 'Move to Next Frame',
@@ -1537,11 +1537,11 @@ var appsdata=[
                   },
                   {
                     title: 'Go one Tab to the Left',
-                    keys: ['Ctrl', 'Alt', 'ArrowLeft'],
+                    keys: ['Ctrl', 'Alt', 'left'],
                   },
                   {
                     title: 'Go one Tab to the Right',
-                    keys: ['Ctrl', 'Alt', 'ArrowRight'],
+                    keys: ['Ctrl', 'Alt', 'right'],
                   },
                   {
                     title: 'Move Tab Left',
@@ -1710,11 +1710,11 @@ var appsdata=[
                 shortcuts: [
                   {
                     title: 'Next page',
-                    keys: ['ArrowRight'],
+                    keys: ['right'],
                   },
                   {
                     title: 'Previous page',
-                    keys: ['ArrowLeft'],
+                    keys: ['left'],
                   },
                   {
                     title: 'Zoom in',
@@ -1800,35 +1800,35 @@ var appsdata=[
                   },
                   {
                     title: 'Decrease volume',
-                    keys: ['ArrowDown'],
+                    keys: ['down'],
                   },
                   {
                     title: 'Increase volume',
-                    keys: ['ArrowUp'],
+                    keys: ['up'],
                   },
                   {
                     title: 'Mute audio',
-                    keys: ['Ctrl', 'ArrowDown'],
+                    keys: ['Ctrl', 'down'],
                   },
                   {
                     title: 'Unmute audio',
-                    keys: ['Ctrl', 'ArrowUp'],
+                    keys: ['Ctrl', 'up'],
                   },
                   {
                     title: 'Seek back 15 seconds',
-                    keys: ['ArrowLeft'],
+                    keys: ['left'],
                   },
                   {
                     title: 'Seek back 10 %',
-                    keys: ['Ctrl', 'ArrowLeft'],
+                    keys: ['Ctrl', 'left'],
                   },
                   {
                     title: 'Seek forward 15 seconds',
-                    keys: ['ArrowRight'],
+                    keys: ['right'],
                   },
                   {
                     title: 'Seek forward 10 %',
-                    keys: ['Ctrl', 'ArrowRight'],
+                    keys: ['Ctrl', 'right'],
                   },
                   {
                     title: 'Seek to the end',
@@ -1895,11 +1895,11 @@ var appsdata=[
   test:[
               {
                 title: 'Back',
-                keys: ['Ctrl', 'ArrowLeft'],
+                keys: ['Ctrl', 'left'],
               },
               {
                 title: 'Forward',
-                keys: ['Ctrl', 'ArrowRight'],
+                keys: ['Ctrl', 'right'],
               },
               {
                 title: 'Open File',
@@ -1935,11 +1935,11 @@ var appsdata=[
               },
               {
                 title: 'Go to Bottom of Page',
-                keys: ['Ctrl', 'ArrowDown'],
+                keys: ['Ctrl', 'down'],
               },
               {
                 title: 'Go to Top of Page',
-                keys: ['Ctrl', 'ArrowUp'],
+                keys: ['Ctrl', 'up'],
               },
               {
                 title: 'Move to Next Frame',
@@ -2031,11 +2031,11 @@ var appsdata=[
               },
               {
                 title: 'Go one Tab to the Left',
-                keys: ['Ctrl', 'Alt', 'ArrowLeft'],
+                keys: ['Ctrl', 'Alt', 'left'],
               },
               {
                 title: 'Go one Tab to the Right',
-                keys: ['Ctrl', 'Alt', 'ArrowRight'],
+                keys: ['Ctrl', 'Alt', 'right'],
               },
               {
                 title: 'Move Tab Left',
@@ -2159,11 +2159,11 @@ var appsdata=[
               },
               {
                 title: 'Next page',
-                keys: ['ArrowRight'],
+                keys: ['right'],
               },
               {
                 title: 'Previous page',
-                keys: ['ArrowLeft'],
+                keys: ['left'],
               },
               {
                 title: 'Zoom in',
@@ -2235,35 +2235,35 @@ var appsdata=[
               },
               {
                 title: 'Decrease volume',
-                keys: ['ArrowDown'],
+                keys: ['down'],
               },
               {
                 title: 'Increase volume',
-                keys: ['ArrowUp'],
+                keys: ['up'],
               },
               {
                 title: 'Mute audio',
-                keys: ['Ctrl', 'ArrowDown'],
+                keys: ['Ctrl', 'down'],
               },
               {
                 title: 'Unmute audio',
-                keys: ['Ctrl', 'ArrowUp'],
+                keys: ['Ctrl', 'up'],
               },
               {
                 title: 'Seek back 15 seconds',
-                keys: ['ArrowLeft'],
+                keys: ['left'],
               },
               {
                 title: 'Seek back 10 %',
-                keys: ['Ctrl', 'ArrowLeft'],
+                keys: ['Ctrl', 'left'],
               },
               {
                 title: 'Seek forward 15 seconds',
-                keys: ['ArrowRight'],
+                keys: ['right'],
               },
               {
                 title: 'Seek forward 10 %',
-                keys: ['Ctrl', 'ArrowRight'],
+                keys: ['Ctrl', 'right'],
               },
               {
                 title: 'Seek to the end',

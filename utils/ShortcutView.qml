@@ -93,10 +93,10 @@ Page {
         case Qt.Key_End: return "End"
         case Qt.Key_PageUp: return "PageUp"
         case Qt.Key_PageDown: return "PageDown"
-        case Qt.Key_Up: return "Up"
-        case Qt.Key_Down: return "Down"
-        case Qt.Key_Left: return "Left"
-        case Qt.Key_Right: return "Right"
+        case Qt.Key_Up: return "up"
+        case Qt.Key_Down: return "down"
+        case Qt.Key_Left: return "left"
+        case Qt.Key_Right: return "right"
         case Qt.Key_Escape: return "Esc"
         case Qt.Key_F1: return "F1"
         case Qt.Key_F2: return "F2"
@@ -156,13 +156,13 @@ Page {
             keyMatch = event.key === Qt.Key_Home
         } else if (currentKey === "End") {
             keyMatch = event.key === Qt.Key_End
-        } else if (currentKey === "Up") {
+        } else if (currentKey === "up") {
             keyMatch = event.key === Qt.Key_Up
-        } else if (currentKey === "Down") {
+        } else if (currentKey === "down") {
             keyMatch = event.key === Qt.Key_Down
-        } else if (currentKey === "Left") {
+        } else if (currentKey === "left") {
             keyMatch = event.key === Qt.Key_Left
-        } else if (currentKey === "Right") {
+        } else if (currentKey === "right") {
             keyMatch = event.key === Qt.Key_Right
         } else if (currentKey === "Esc" || currentKey === "Escape") {
             keyMatch = event.key === Qt.Key_Escape

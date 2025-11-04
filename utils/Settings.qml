@@ -443,7 +443,7 @@ Rectangle {
                 onClicked: {
                     userDataManager.setCurrentUser("")
                     stackView.clear()
-                    stackView.push("UserManager.qml", {
+                    stackView.push("../UserManager.qml", {
                         appsdata: Fn.appsdata,
                         stackView: stackView
                     })

@@ -334,6 +334,35 @@ Page {
             lastKeyPressed = keyEventToString(event)
             debugInfo = "Key pressed: " + lastKeyPressed + " (Code: " + lastKeyCode + ")"
 
+            // Handle arrow key navigation FIRST (only when idle, before auto-repeat check)
+            if (currentStep === 0) {
+                // LEFT arrow - hold for 2 seconds to SKIP FORWARD
+                if (event.key === Qt.Key_Left) {
+                    if (!event.isAutoRepeat) {
+                        leftArrowHeld = true
+                        leftArrowTimer.restart()
+                        debugInfo = "Left arrow pressed (hold 2s to skip forward)..."
+                    } else {
+                        debugInfo = "Left arrow held (timer running)..."
+                    }
+                    event.accepted = true
+                    return
+                }
+
+                // RIGHT arrow - hold for 2 seconds to GO BACK
+                if (event.key === Qt.Key_Right) {
+                    if (!event.isAutoRepeat) {
+                        rightArrowHeld = true
+                        rightArrowTimer.restart()
+                        debugInfo = "Right arrow pressed (hold 2s to go back)..."
+                    } else {
+                        debugInfo = "Right arrow held (timer running)..."
+                    }
+                    event.accepted = true
+                    return
+                }
+            }
+
             if (event.isAutoRepeat) {
                 event.accepted = true  // Block IPC
                 debugInfo += " [AUTO-REPEAT BLOCKED]"
@@ -360,27 +389,6 @@ Page {
                 })
                 event.accepted = true
                 return
-            }
-
-            // Handle arrow key navigation (only when idle)
-            if (currentStep === 0) {
-                // Left arrow - hold for 2 seconds to go back
-                if (event.key === Qt.Key_Left) {
-                    leftArrowHeld = true
-                    leftArrowTimer.restart()
-                    debugInfo = "Left arrow pressed (hold 2s to go back)..."
-                    event.accepted = true
-                    return
-                }
-
-                // Right arrow - hold for 2 seconds to skip forward
-                if (event.key === Qt.Key_Right) {
-                    rightArrowHeld = true
-                    rightArrowTimer.restart()
-                    debugInfo = "Right arrow pressed (hold 2s to skip)..."
-                    event.accepted = true
-                    return
-                }
             }
 
             const currentKey = expectedSequence[currentStep]
@@ -626,7 +634,7 @@ Page {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Hold RIGHT arrow 2s to skip • Hold LEFT arrow 2s for previous • ESC+SPACE to exit"
+                text: "Hold LEFT arrow 2s to skip • Hold RIGHT arrow 2s for previous • ESC+SPACE to exit"
                 font.pixelSize: 11
                 color: "#888888"
             }
@@ -780,12 +788,12 @@ Page {
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  Hold RIGHT arrow 2s - Skip to next question"
+                            text: "  Hold LEFT arrow 2s - Skip to next question"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Hold LEFT arrow 2s - Go to previous question"
+                            text: "  Hold RIGHT arrow 2s - Go to previous question"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
@@ -864,28 +872,28 @@ Page {
         onTriggered: advanceShortcut()
     }
 
-    // Timer for left arrow hold (2 seconds)
+    // Timer for left arrow hold (2 seconds) - LEFT = SKIP FORWARD
     Timer {
         id: leftArrowTimer
         interval: 2000
         onTriggered: {
             if (leftArrowHeld && currentStep === 0) {
-                debugInfo = "Left arrow held 2s! Going back..."
-                skipLeft()
+                debugInfo = "Left arrow held 2s! Skipping forward..."
+                skipRight()  // LEFT arrow skips forward
                 leftArrowHeld = false
                 keyHandler.forceActiveFocus()  // Restore focus after navigation
             }
         }
     }
 
-    // Timer for right arrow hold (2 seconds)
+    // Timer for right arrow hold (2 seconds) - RIGHT = GO BACK
     Timer {
         id: rightArrowTimer
         interval: 2000
         onTriggered: {
             if (rightArrowHeld && currentStep === 0) {
-                debugInfo = "Right arrow held 2s! Skipping forward..."
-                skipRight()
+                debugInfo = "Right arrow held 2s! Going back..."
+                skipLeft()  // RIGHT arrow goes back
                 rightArrowHeld = false
                 keyHandler.forceActiveFocus()  // Restore focus after navigation
             }

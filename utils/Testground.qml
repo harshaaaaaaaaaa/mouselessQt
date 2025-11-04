@@ -360,14 +360,10 @@ Page {
                 return
             }
 
-            // Handle arrow key navigation (only when idle and no modifiers)
+            // Handle arrow key navigation (only when idle)
             if (currentStep === 0) {
-                var hasModifiers = (event.modifiers & Qt.ControlModifier) ||
-                                   (event.modifiers & Qt.AltModifier) ||
-                                   (event.modifiers & Qt.ShiftModifier)
-
                 // Left arrow - hold for 2 seconds to go back
-                if (event.key === Qt.Key_Left && !hasModifiers) {
+                if (event.key === Qt.Key_Left) {
                     leftArrowHeld = true
                     leftArrowTimer.restart()
                     debugInfo = "Left arrow pressed (hold 2s to go back)..."
@@ -376,7 +372,7 @@ Page {
                 }
 
                 // Right arrow - hold for 2 seconds to skip forward
-                if (event.key === Qt.Key_Right && !hasModifiers) {
+                if (event.key === Qt.Key_Right) {
                     rightArrowHeld = true
                     rightArrowTimer.restart()
                     debugInfo = "Right arrow pressed (hold 2s to skip)..."
@@ -793,12 +789,12 @@ Page {
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Arrow + Modifier keys - Processes as shortcut"
+                            text: "  Release arrow early - Cancel navigation"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Release keys early - Reset and try again"
+                            text: "  Arrows work in shortcuts when expected"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }

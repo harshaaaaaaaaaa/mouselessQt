@@ -97,7 +97,7 @@ Rectangle {
             Text {
                 id: unlockProgress
                 visible: learnedCount < 20
-                text: "🔒 Learn " + learnedCount + "/20 shortcuts to unlock Quiz"
+                text: "🔒 Learn " + learnedCount + "/20 shortcuts to unlock Test Mode"
                 color: "#ffaa00"
                 font { pixelSize: parent.height/6; bold: true }
                 anchors {
@@ -107,9 +107,48 @@ Rectangle {
                 }
             }
 
+            // Training Mode Button (always available)
+            Button {
+                id: trainingButton
+                visible: learnedCount < 20
+                text: "📚 Training Mode"
+                font { pixelSize: trainingButton.height/3; bold: true }
+                height: parent.height/3
+                width: parent.width/10
+                anchors{
+                    right: parent.right
+                    rightMargin: parent.width/10 + 20
+                    verticalCenter: parent.verticalCenter
+                }
+
+                background: Rectangle {
+                    color: trainingButton.hovered ? "#4488ff" : "#3377ee"
+                    radius: 8
+                    border.color: "#5599ff"
+                    border.width: 2
+                }
+
+                contentItem: Text {
+                    text: trainingButton.text
+                    font: trainingButton.font
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    stackView.push("Testground.qml", {
+                        appsdata: appsdata,
+                        stackView: stackView,
+                        mode: "training"
+                    })
+                }
+            }
+
+            // Test Mode Button (locked until 20 learned)
             Button {
                 id: testButton
-                text: learnedCount >= 20 ? "Test your learning" : "🔒 Locked"
+                text: learnedCount >= 20 ? "✓ Test Mode" : "🔒 Locked"
                 enabled: learnedCount >= 20
                 font { pixelSize: testButton.height/3; bold: true }
                 height: parent.height/3
@@ -138,7 +177,8 @@ Rectangle {
                     if (learnedCount >= 20) {
                         stackView.push("Testground.qml", {
                             appsdata: appsdata,
-                            stackView: stackView
+                            stackView: stackView,
+                            mode: "test"
                         })
                     }
                 }

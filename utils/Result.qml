@@ -12,6 +12,7 @@ Rectangle{
      required property var appsdata
      required property StackView stackView
      required property var attemptedKeys
+     property string mode: "test"  // "training" or "test"
      property int correctkey: 0
      property int wrongkey: 0
 
@@ -33,15 +34,18 @@ Rectangle{
     onAttemptedKeysChanged: updateKeyCounts()
 
     function saveTestSession() {
-        var score = 4*correctkey - wrongkey
-        userDataManager.saveTestSession(
-            appsdata.id,
-            appsdata.test ? "test" : "unknown",
-            attemptedKeys,
-            correctkey,
-            wrongkey,
-            score
-        )
+        // Only save stats in test mode, not training mode
+        if (mode === "test") {
+            var score = 4*correctkey - wrongkey
+            userDataManager.saveTestSession(
+                appsdata.id,
+                appsdata.test ? "test" : "unknown",
+                attemptedKeys,
+                correctkey,
+                wrongkey,
+                score
+            )
+        }
         // Clear session state since test is complete
         userDataManager.clearSessionState(appsdata.id || "unknown", "testground")
     }
@@ -115,12 +119,37 @@ Rectangle{
         }
     }
 
+    // Mode indicator
+    Rectangle {
+        anchors {
+            top: headerBar.bottom
+            topMargin: 15
+            horizontalCenter: parent.horizontalCenter
+        }
+        height: 35
+        width: modeText.width + 24
+        radius: 17.5
+        color: mode === "training" ? "#3377ee" : "#6fda00"
+        border.color: mode === "training" ? "#5599ff" : "#7feb10"
+        border.width: 2
+        visible: mode === "training"  // Only show badge in training mode
+
+        Text {
+            id: modeText
+            anchors.centerIn: parent
+            text: "📚 TRAINING MODE - Stats not saved"
+            font.pixelSize: 12
+            font.bold: true
+            color: "#ffffff"
+        }
+    }
+
     Row {
           visible: true
           spacing: 20
           anchors{
                  top: headerBar.bottom
-                 topMargin: 30
+                 topMargin: mode === "training" ? 60 : 30
                 horizontalCenter: parent.horizontalCenter
             }
          Text {

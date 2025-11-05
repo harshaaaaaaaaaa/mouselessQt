@@ -8,9 +8,10 @@ Page {
 
     required property var appsdata
     required property StackView stackView
+    property string mode: "test"  // "training" or "test"
 
     background: Rectangle {
-        color: "#0a0a0a"
+        color: mode === "training" ? "#0a0a1a" : "#0a0a0a"  // Slight blue tint for training
     }
 
     // State management
@@ -283,11 +284,29 @@ Page {
 
             Item { Layout.fillWidth: true }
 
+            // Mode Indicator
+            Rectangle {
+                Layout.preferredHeight: 30
+                Layout.preferredWidth: childText.width + 24
+                radius: 15
+                color: mode === "training" ? "#3377ee" : "#6fda00"
+                border.color: mode === "training" ? "#5599ff" : "#7feb10"
+                border.width: 2
+
+                Text {
+                    id: childText
+                    anchors.centerIn: parent
+                    text: mode === "training" ? "📚 TRAINING MODE" : "✓ TEST MODE"
+                    font.pixelSize: 12
+                    font.bold: true
+                    color: mode === "training" ? "#ffffff" : "#000000"
+                }
+            }
+
             Text {
-                text: "Test Mode - Guess the Keys!"
-                font.pixelSize: 14
-                font.bold: true
-                color: "#ff8800"
+                text: mode === "training" ? "Practice freely - mistakes are okay!" : "Strict mode - prove your skills!"
+                font.pixelSize: 11
+                color: mode === "training" ? "#aaccff" : "#ff8800"
             }
 
             // Help button
@@ -700,7 +719,8 @@ Page {
                         stackView.push("Result.qml", {
                             attemptedKeys: attemptedKeys,
                             appsdata: appsdata,
-                            stackView: stackView
+                            stackView: stackView,
+                            mode: mode
                         })
                     }
                 }

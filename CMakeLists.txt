@@ -15,6 +15,8 @@ qt_add_executable(apppractice
     userdatamanager.cpp
     fuzzysearch.h
     fuzzysearch.cpp
+    keyboardlayout.h
+    keyboardlayout.cpp
 )
 
 qt_add_qml_module(apppractice

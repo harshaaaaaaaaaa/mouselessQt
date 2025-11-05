@@ -181,6 +181,86 @@ Rectangle {
                 }
             }
 
+            // Keyboard Layout card
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 200
+                color: "#151515"
+                radius: 12
+                border.color: "#2a2a2a"
+                border.width: 1
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 15
+
+                    Text {
+                        text: "Keyboard Layout"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "#6fda00"
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: `Current layout: ${keyboardLayout.currentLayout}\nSelect your keyboard layout for accurate key display.`
+                        font.pixelSize: 13
+                        color: "#cccccc"
+                        wrapMode: Text.WordWrap
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 10
+
+                        Repeater {
+                            model: ["QWERTY", "AZERTY", "QWERTZ"]
+
+                            Button {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 50
+
+                                background: Rectangle {
+                                    color: keyboardLayout.currentLayout === modelData ?
+                                           "#6fda00" :
+                                           (parent.hovered ? "#252525" : "#1a1a1a")
+                                    radius: 8
+                                    border.color: keyboardLayout.currentLayout === modelData ?
+                                                  "#6fda00" : "#333333"
+                                    border.width: 2
+
+                                    Behavior on color {
+                                        ColorAnimation { duration: 150 }
+                                    }
+                                }
+
+                                contentItem: Text {
+                                    text: modelData
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                    color: keyboardLayout.currentLayout === modelData ?
+                                           "#000000" : "#ffffff"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+
+                                    Behavior on color {
+                                        ColorAnimation { duration: 150 }
+                                    }
+                                }
+
+                                onClicked: {
+                                    keyboardLayout.setLayout(modelData)
+                                    statusMessage = "Keyboard layout changed to " + modelData
+                                    statusColor = "#6fda00"
+                                    statusTimer.restart()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Backup & Restore card
             Rectangle {
                 Layout.fillWidth: true

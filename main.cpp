@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include "userdatamanager.h"
 #include "fuzzysearch.h"
+#include "keyboardlayout.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,10 @@ int main(int argc, char *argv[])
     // Create and register FuzzySearch
     FuzzySearch *fuzzySearch = new FuzzySearch(&app);
     engine.rootContext()->setContextProperty("fuzzySearch", fuzzySearch);
+
+    // Create and register KeyboardLayout
+    KeyboardLayout *keyboardLayout = new KeyboardLayout(&app);
+    engine.rootContext()->setContextProperty("keyboardLayout", keyboardLayout);
 
     QObject::connect(
         &engine,

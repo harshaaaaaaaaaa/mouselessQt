@@ -4,6 +4,7 @@
 #include "userdatamanager.h"
 #include "fuzzysearch.h"
 #include "keyboardlayout.h"
+#include "activewindowdetector.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +29,10 @@ int main(int argc, char *argv[])
     // Create and register KeyboardLayout
     KeyboardLayout *keyboardLayout = new KeyboardLayout(&app);
     engine.rootContext()->setContextProperty("keyboardLayout", keyboardLayout);
+
+    // Create and register ActiveWindowDetector
+    ActiveWindowDetector *activeWindow = new ActiveWindowDetector(&app);
+    engine.rootContext()->setContextProperty("activeWindow", activeWindow);
 
     QObject::connect(
         &engine,

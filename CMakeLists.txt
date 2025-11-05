@@ -7,6 +7,11 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
+# Find X11 for Linux active window detection
+if(UNIX AND NOT APPLE)
+    find_package(X11)
+endif()
+
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(apppractice
@@ -17,6 +22,8 @@ qt_add_executable(apppractice
     fuzzysearch.cpp
     keyboardlayout.h
     keyboardlayout.cpp
+    activewindowdetector.h
+    activewindowdetector.cpp
 )
 
 qt_add_qml_module(apppractice
@@ -53,6 +60,12 @@ set_target_properties(apppractice PROPERTIES
 target_link_libraries(apppractice
     PRIVATE Qt6::Quick
 )
+
+# Link X11 library for Linux active window detection
+if(UNIX AND NOT APPLE AND X11_FOUND)
+    target_link_libraries(apppractice PRIVATE ${X11_LIBRARIES})
+    target_include_directories(apppractice PRIVATE ${X11_INCLUDE_DIR})
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS apppractice

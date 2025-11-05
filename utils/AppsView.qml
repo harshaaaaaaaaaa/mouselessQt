@@ -116,31 +116,183 @@ Rectangle {
     }
 
     // Main content
-    ColumnLayout {
+    ScrollView {
         anchors.top: headerBar.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 20
-        spacing: 25
+        clip: true
 
-        // Title
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Choose an Application"
-            font.pixelSize: 24
-            font.bold: true
-            color: "#ffffff"
-        }
+        ColumnLayout {
+            width: parent.parent.width - 40
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 25
 
-        // Apps grid
-        GridLayout {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            columns: 2
-            rowSpacing: 20
-            columnSpacing: 20
+            Item { height: 10 }
+
+            // Stats hero section
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 120
+                color: "#151515"
+                radius: 16
+                border.color: "#2a2a2a"
+                border.width: 2
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 25
+                    spacing: 30
+
+                    // Title section
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Text {
+                            text: "Welcome Back, " + userDataManager.currentUser + "!"
+                            font.pixelSize: 26
+                            font.bold: true
+                            color: "#ffffff"
+                        }
+
+                        Text {
+                            text: "Master keyboard shortcuts from 34 applications"
+                            font.pixelSize: 14
+                            color: "#888888"
+                        }
+                    }
+
+                    // Quick stats
+                    RowLayout {
+                        spacing: 30
+
+                        // Tests completed
+                        ColumnLayout {
+                            spacing: 5
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: userDataManager.getOverallStats().totalTests || 0
+                                font.pixelSize: 32
+                                font.bold: true
+                                color: "#6fda00"
+                            }
+
+                            Text {
+                                text: "Tests"
+                                font.pixelSize: 12
+                                color: "#888888"
+                            }
+                        }
+
+                        Rectangle {
+                            width: 1
+                            height: 50
+                            color: "#333333"
+                        }
+
+                        // Average score
+                        ColumnLayout {
+                            spacing: 5
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: (userDataManager.getOverallStats().averageScore || 0).toFixed(0) + "%"
+                                font.pixelSize: 32
+                                font.bold: true
+                                color: "#6fda00"
+                            }
+
+                            Text {
+                                text: "Accuracy"
+                                font.pixelSize: 12
+                                color: "#888888"
+                            }
+                        }
+
+                        Rectangle {
+                            width: 1
+                            height: 50
+                            color: "#333333"
+                        }
+
+                        // Progress button
+                        Button {
+                            Layout.preferredWidth: 140
+                            Layout.preferredHeight: 50
+
+                            background: Rectangle {
+                                color: parent.hovered ? "#7feb10" : "#6fda00"
+                                radius: 10
+                                border.color: "#7feb10"
+                                border.width: 2
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 150 }
+                                }
+                            }
+
+                            contentItem: ColumnLayout {
+                                spacing: 2
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "📊"
+                                    font.pixelSize: 20
+                                }
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Dashboard"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: "#000000"
+                                }
+                            }
+
+                            onClicked: {
+                                stackView.push("ProgressDashboard.qml", {
+                                    stackView: stackView
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Section header
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 15
+
+                Text {
+                    text: "Applications"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "#ffffff"
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 2
+                    color: "#2a2a2a"
+                    radius: 1
+                }
+
+                Text {
+                    text: appsdata.length + " apps"
+                    font.pixelSize: 14
+                    color: "#888888"
+                }
+            }
+
+            // Apps grid
+            GridLayout {
+                Layout.fillWidth: true
+                columns: 4
+                rowSpacing: 20
+                columnSpacing: 20
 
             Repeater {
                 model: appsdata

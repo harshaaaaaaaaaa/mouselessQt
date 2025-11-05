@@ -5,6 +5,7 @@
 #include "fuzzysearch.h"
 #include "keyboardlayout.h"
 #include "activewindowdetector.h"
+#include "globalshortcuts.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,25 @@ int main(int argc, char *argv[])
     // Create and register ActiveWindowDetector
     ActiveWindowDetector *activeWindow = new ActiveWindowDetector(&app);
     engine.rootContext()->setContextProperty("activeWindow", activeWindow);
+
+    // Create and register GlobalShortcuts
+    GlobalShortcuts *globalShortcuts = new GlobalShortcuts(&app);
+    engine.rootContext()->setContextProperty("globalShortcuts", globalShortcuts);
+
+    // Connect global shortcuts to show/hide window
+    QObject::connect(globalShortcuts, &GlobalShortcuts::shortcutActivated, [&engine](const QString &id) {
+        if (id == "toggle") {
+            QObject *root = engine.rootObjects().first();
+            if (root) {
+                QMetaObject::invokeMethod(root, "toggleWindow");
+            }
+        } else if (id == "lookup") {
+            QObject *root = engine.rootObjects().first();
+            if (root) {
+                QMetaObject::invokeMethod(root, "showLookup");
+            }
+        }
+    });
 
     QObject::connect(
         &engine,

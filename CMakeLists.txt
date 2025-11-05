@@ -7,9 +7,10 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
-# Find X11 for Linux active window detection
+# Find X11 for Linux active window detection and global shortcuts
 if(UNIX AND NOT APPLE)
     find_package(X11)
+    find_package(Qt6 COMPONENTS Gui REQUIRED)
 endif()
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -24,6 +25,8 @@ qt_add_executable(apppractice
     keyboardlayout.cpp
     activewindowdetector.h
     activewindowdetector.cpp
+    globalshortcuts.h
+    globalshortcuts.cpp
 )
 
 qt_add_qml_module(apppractice
@@ -42,6 +45,8 @@ qt_add_qml_module(apppractice
         utils/UserManager.qml
         utils/Settings.qml
         utils/LookupView.qml
+        utils/CircularProgress.qml
+        utils/ProgressDashboard.qml
     RESOURCES
         Resource.qrc
 )

@@ -13,6 +13,8 @@ qt_add_executable(apppractice
     main.cpp
     userdatamanager.h
     userdatamanager.cpp
+    fuzzysearch.h
+    fuzzysearch.cpp
 )
 
 qt_add_qml_module(apppractice
@@ -30,6 +32,7 @@ qt_add_qml_module(apppractice
         utils/KeyAnalysis.qml
         utils/UserManager.qml
         utils/Settings.qml
+        utils/LookupView.qml
     RESOURCES
         Resource.qrc
 )

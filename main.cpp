@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "userdatamanager.h"
+#include "fuzzysearch.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +19,10 @@ int main(int argc, char *argv[])
     // Create and register UserDataManager
     UserDataManager *userDataManager = new UserDataManager(&app);
     engine.rootContext()->setContextProperty("userDataManager", userDataManager);
+
+    // Create and register FuzzySearch
+    FuzzySearch *fuzzySearch = new FuzzySearch(&app);
+    engine.rootContext()->setContextProperty("fuzzySearch", fuzzySearch);
 
     QObject::connect(
         &engine,

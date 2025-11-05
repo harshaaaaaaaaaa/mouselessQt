@@ -3169,6 +3169,762 @@ var appsdata=[
       },
     ],
   },
+  {
+    id: 'figma',
+    appicon: 'qrc:/Images/figma.png',
+    title: 'Figma',
+    category: 'Design',
+    description: 'Figma is a collaborative design tool. Master these shortcuts to design faster and work more efficiently.',
+    sets: [
+      {
+        title: 'Tools',
+        id: 'tools',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Move Tool',
+            keys: ['V'],
+          },
+          {
+            title: 'Frame Tool',
+            keys: ['F'],
+          },
+          {
+            title: 'Rectangle',
+            keys: ['R'],
+          },
+          {
+            title: 'Ellipse',
+            keys: ['O'],
+          },
+          {
+            title: 'Line',
+            keys: ['L'],
+          },
+          {
+            title: 'Pen Tool',
+            keys: ['P'],
+          },
+          {
+            title: 'Text Tool',
+            keys: ['T'],
+          },
+          {
+            title: 'Hand Tool',
+            keys: ['H'],
+          },
+          {
+            title: 'Comment',
+            keys: ['C'],
+          },
+          {
+            title: 'Eyedropper',
+            keys: ['I'],
+          },
+        ],
+      },
+      {
+        title: 'View',
+        id: 'view',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Zoom In',
+            keys: ['Ctrl', '+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['Ctrl', '-'],
+          },
+          {
+            title: 'Zoom to 100%',
+            keys: ['Ctrl', '0'],
+          },
+          {
+            title: 'Zoom to Fit',
+            keys: ['Ctrl', '1'],
+          },
+          {
+            title: 'Zoom to Selection',
+            keys: ['Ctrl', '2'],
+          },
+          {
+            title: 'Toggle UI',
+            keys: ['Ctrl', '\\'],
+          },
+          {
+            title: 'Toggle Rulers',
+            keys: ['Shift', 'R'],
+          },
+          {
+            title: 'Toggle Grid',
+            keys: ['Ctrl', "'"],
+          },
+          {
+            title: 'Toggle Layout Grids',
+            keys: ['Ctrl', 'G'],
+          },
+        ],
+      },
+      {
+        title: 'Objects',
+        id: 'objects',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Group Selection',
+            keys: ['Ctrl', 'G'],
+          },
+          {
+            title: 'Ungroup',
+            keys: ['Ctrl', 'Shift', 'G'],
+          },
+          {
+            title: 'Frame Selection',
+            keys: ['Ctrl', 'Alt', 'G'],
+          },
+          {
+            title: 'Duplicate',
+            keys: ['Ctrl', 'D'],
+          },
+          {
+            title: 'Bring Forward',
+            keys: ['Ctrl', ']'],
+          },
+          {
+            title: 'Bring to Front',
+            keys: ['Ctrl', 'Shift', ']'],
+          },
+          {
+            title: 'Send Backward',
+            keys: ['Ctrl', '['],
+          },
+          {
+            title: 'Send to Back',
+            keys: ['Ctrl', 'Shift', '['],
+          },
+          {
+            title: 'Lock/Unlock',
+            keys: ['Ctrl', 'Shift', 'L'],
+          },
+          {
+            title: 'Hide/Show',
+            keys: ['Ctrl', 'Shift', 'H'],
+          },
+        ],
+      },
+      {
+        title: 'Edit',
+        id: 'edit',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Undo',
+            keys: ['Ctrl', 'Z'],
+          },
+          {
+            title: 'Redo',
+            keys: ['Ctrl', 'Shift', 'Z'],
+          },
+          {
+            title: 'Copy',
+            keys: ['Ctrl', 'C'],
+          },
+          {
+            title: 'Paste',
+            keys: ['Ctrl', 'V'],
+          },
+          {
+            title: 'Copy as PNG',
+            keys: ['Ctrl', 'Shift', 'C'],
+          },
+          {
+            title: 'Paste over Selection',
+            keys: ['Ctrl', 'Shift', 'V'],
+          },
+          {
+            title: 'Delete',
+            keys: ['Delete'],
+          },
+          {
+            title: 'Select All',
+            keys: ['Ctrl', 'A'],
+          },
+        ],
+      },
+      {
+        title: 'Components',
+        id: 'components',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Create Component',
+            keys: ['Ctrl', 'Alt', 'K'],
+          },
+          {
+            title: 'Detach Instance',
+            keys: ['Ctrl', 'Alt', 'B'],
+          },
+          {
+            title: 'Go to Main Component',
+            keys: ['Ctrl', 'Alt', 'E'],
+          },
+          {
+            title: 'Create Component Set',
+            keys: ['Ctrl', 'Alt', 'Shift', 'K'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'discord',
+    appicon: 'qrc:/Images/discord.png',
+    title: 'Discord',
+    category: 'Communication',
+    description: 'Discord is a voice, video and text communication platform. Navigate servers and channels efficiently with these shortcuts.',
+    sets: [
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Quick Switcher',
+            keys: ['Ctrl', 'K'],
+          },
+          {
+            title: 'Previous Server',
+            keys: ['Ctrl', 'Alt', 'up'],
+          },
+          {
+            title: 'Next Server',
+            keys: ['Ctrl', 'Alt', 'down'],
+          },
+          {
+            title: 'Previous Channel',
+            keys: ['Alt', 'up'],
+          },
+          {
+            title: 'Next Channel',
+            keys: ['Alt', 'down'],
+          },
+          {
+            title: 'Previous Unread Channel',
+            keys: ['Alt', 'Shift', 'up'],
+          },
+          {
+            title: 'Next Unread Channel',
+            keys: ['Alt', 'Shift', 'down'],
+          },
+          {
+            title: 'Mark Server as Read',
+            keys: ['Shift', 'Esc'],
+          },
+          {
+            title: 'Mark Channel as Read',
+            keys: ['Esc'],
+          },
+        ],
+      },
+      {
+        title: 'Messaging',
+        id: 'messaging',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Focus Text Area',
+            keys: ['Tab'],
+          },
+          {
+            title: 'Upload File',
+            keys: ['Ctrl', 'Shift', 'U'],
+          },
+          {
+            title: 'Edit Last Message',
+            keys: ['up'],
+          },
+          {
+            title: 'Mark as Unread',
+            keys: ['Alt', 'Enter'],
+          },
+          {
+            title: 'Pin Message',
+            keys: ['Ctrl', 'Shift', 'P'],
+          },
+          {
+            title: 'Add Reaction',
+            keys: ['Ctrl', 'Shift', '+'],
+          },
+        ],
+      },
+      {
+        title: 'Voice & Video',
+        id: 'voice',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Toggle Mute',
+            keys: ['Ctrl', 'Shift', 'M'],
+          },
+          {
+            title: 'Toggle Deafen',
+            keys: ['Ctrl', 'Shift', 'D'],
+          },
+          {
+            title: 'Answer Incoming Call',
+            keys: ['Ctrl', 'Enter'],
+          },
+          {
+            title: 'Decline Incoming Call',
+            keys: ['Esc'],
+          },
+          {
+            title: 'Start Voice Call',
+            keys: ['Ctrl', "'"],
+          },
+          {
+            title: 'Start Video Call',
+            keys: ['Ctrl', 'Shift', "'"],
+          },
+        ],
+      },
+      {
+        title: 'Search & Settings',
+        id: 'search',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Search',
+            keys: ['Ctrl', 'F'],
+          },
+          {
+            title: 'User Settings',
+            keys: ['Ctrl', ','],
+          },
+          {
+            title: 'Create/Join Server',
+            keys: ['Ctrl', 'Shift', 'N'],
+          },
+          {
+            title: 'Toggle Emoji Picker',
+            keys: ['Ctrl', 'E'],
+          },
+          {
+            title: 'Toggle GIF Picker',
+            keys: ['Ctrl', 'G'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'thunderbird',
+    appicon: 'qrc:/Images/thunderbird.png',
+    title: 'Thunderbird',
+    category: 'Productivity',
+    description: 'Thunderbird is a free email client. Manage your emails faster with these essential keyboard shortcuts.',
+    sets: [
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Next Message',
+            keys: ['F'],
+          },
+          {
+            title: 'Previous Message',
+            keys: ['B'],
+          },
+          {
+            title: 'Next Unread',
+            keys: ['N'],
+          },
+          {
+            title: 'Go to Inbox',
+            keys: ['Ctrl', '1'],
+          },
+          {
+            title: 'Quick Filter Bar',
+            keys: ['Ctrl', 'Shift', 'K'],
+          },
+          {
+            title: 'Search Messages',
+            keys: ['Ctrl', 'K'],
+          },
+        ],
+      },
+      {
+        title: 'Message Actions',
+        id: 'actions',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Message',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Reply',
+            keys: ['Ctrl', 'R'],
+          },
+          {
+            title: 'Reply All',
+            keys: ['Ctrl', 'Shift', 'R'],
+          },
+          {
+            title: 'Forward',
+            keys: ['Ctrl', 'L'],
+          },
+          {
+            title: 'Archive',
+            keys: ['A'],
+          },
+          {
+            title: 'Delete',
+            keys: ['Delete'],
+          },
+          {
+            title: 'Mark as Junk',
+            keys: ['J'],
+          },
+          {
+            title: 'Mark as Read',
+            keys: ['M'],
+          },
+          {
+            title: 'Mark as Unread',
+            keys: ['Shift', 'M'],
+          },
+        ],
+      },
+      {
+        title: 'Compose',
+        id: 'compose',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Send Now',
+            keys: ['Ctrl', 'Enter'],
+          },
+          {
+            title: 'Send Later',
+            keys: ['Ctrl', 'Shift', 'Enter'],
+          },
+          {
+            title: 'Save as Draft',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'Attach File',
+            keys: ['Ctrl', 'Shift', 'A'],
+          },
+          {
+            title: 'Address Book',
+            keys: ['Ctrl', 'Shift', 'B'],
+          },
+        ],
+      },
+      {
+        title: 'Folders',
+        id: 'folders',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Folder',
+            keys: ['Ctrl', 'Shift', 'N'],
+          },
+          {
+            title: 'Rename Folder',
+            keys: ['F2'],
+          },
+          {
+            title: 'Delete Folder',
+            keys: ['Shift', 'Delete'],
+          },
+          {
+            title: 'Get Messages',
+            keys: ['Ctrl', 'T'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'obsidian',
+    appicon: 'qrc:/Images/obsidian.png',
+    title: 'Obsidian',
+    category: 'Productivity',
+    description: 'Obsidian is a powerful knowledge base and note-taking app. Navigate your notes faster with these shortcuts.',
+    sets: [
+      {
+        title: 'File Operations',
+        id: 'file',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Note',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Open Quick Switcher',
+            keys: ['Ctrl', 'O'],
+          },
+          {
+            title: 'Open Command Palette',
+            keys: ['Ctrl', 'P'],
+          },
+          {
+            title: 'Search in All Files',
+            keys: ['Ctrl', 'Shift', 'F'],
+          },
+          {
+            title: 'Graph View',
+            keys: ['Ctrl', 'G'],
+          },
+          {
+            title: 'Star Current File',
+            keys: ['Ctrl', 'Shift', 'S'],
+          },
+        ],
+      },
+      {
+        title: 'Editing',
+        id: 'editing',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Bold',
+            keys: ['Ctrl', 'B'],
+          },
+          {
+            title: 'Italic',
+            keys: ['Ctrl', 'I'],
+          },
+          {
+            title: 'Insert Link',
+            keys: ['Ctrl', 'K'],
+          },
+          {
+            title: 'Insert Internal Link',
+            keys: ['Ctrl', 'Shift', 'K'],
+          },
+          {
+            title: 'Toggle Checkbox',
+            keys: ['Ctrl', 'Enter'],
+          },
+          {
+            title: 'Delete Paragraph',
+            keys: ['Ctrl', 'D'],
+          },
+          {
+            title: 'Find in Current File',
+            keys: ['Ctrl', 'F'],
+          },
+          {
+            title: 'Replace in Current File',
+            keys: ['Ctrl', 'H'],
+          },
+        ],
+      },
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Navigate Back',
+            keys: ['Ctrl', 'Alt', 'left'],
+          },
+          {
+            title: 'Navigate Forward',
+            keys: ['Ctrl', 'Alt', 'right'],
+          },
+          {
+            title: 'Follow Link',
+            keys: ['Ctrl', 'Click'],
+          },
+          {
+            title: 'Open in New Pane',
+            keys: ['Ctrl', 'Shift', 'Click'],
+          },
+          {
+            title: 'Toggle Left Sidebar',
+            keys: ['Ctrl', 'Shift', 'left'],
+          },
+          {
+            title: 'Toggle Right Sidebar',
+            keys: ['Ctrl', 'Shift', 'right'],
+          },
+        ],
+      },
+      {
+        title: 'View',
+        id: 'view',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Toggle Edit/Preview',
+            keys: ['Ctrl', 'E'],
+          },
+          {
+            title: 'Toggle Reading View',
+            keys: ['Ctrl', 'Shift', 'E'],
+          },
+          {
+            title: 'Close Active Pane',
+            keys: ['Ctrl', 'W'],
+          },
+          {
+            title: 'Split Vertical',
+            keys: ['Ctrl', '\\'],
+          },
+          {
+            title: 'Zoom In',
+            keys: ['Ctrl', '+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['Ctrl', '-'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'spotify',
+    appicon: 'qrc:/Images/spotify.png',
+    title: 'Spotify',
+    category: 'Media',
+    description: 'Spotify is a music streaming service. Control your music without touching the mouse using these shortcuts.',
+    sets: [
+      {
+        title: 'Playback',
+        id: 'playback',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Play/Pause',
+            keys: ['Space'],
+          },
+          {
+            title: 'Next Track',
+            keys: ['Ctrl', 'right'],
+          },
+          {
+            title: 'Previous Track',
+            keys: ['Ctrl', 'left'],
+          },
+          {
+            title: 'Volume Up',
+            keys: ['Ctrl', 'up'],
+          },
+          {
+            title: 'Volume Down',
+            keys: ['Ctrl', 'down'],
+          },
+          {
+            title: 'Mute',
+            keys: ['Ctrl', 'M'],
+          },
+          {
+            title: 'Seek Forward',
+            keys: ['Shift', 'right'],
+          },
+          {
+            title: 'Seek Backward',
+            keys: ['Shift', 'left'],
+          },
+          {
+            title: 'Toggle Shuffle',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'Toggle Repeat',
+            keys: ['Ctrl', 'R'],
+          },
+        ],
+      },
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Search',
+            keys: ['Ctrl', 'L'],
+          },
+          {
+            title: 'Home',
+            keys: ['Ctrl', 'H'],
+          },
+          {
+            title: 'Go to Artist',
+            keys: ['Ctrl', 'Alt', 'A'],
+          },
+          {
+            title: 'Go to Album',
+            keys: ['Ctrl', 'Alt', 'L'],
+          },
+          {
+            title: 'Queue',
+            keys: ['Ctrl', 'G'],
+          },
+          {
+            title: 'Browse',
+            keys: ['Ctrl', 'Shift', 'B'],
+          },
+        ],
+      },
+      {
+        title: 'Playlists',
+        id: 'playlists',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Playlist',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Like Song',
+            keys: ['Ctrl', 'Alt', 'L'],
+          },
+          {
+            title: 'Add to Playlist',
+            keys: ['Ctrl', 'D'],
+          },
+          {
+            title: 'Copy Song Link',
+            keys: ['Ctrl', 'Alt', 'C'],
+          },
+        ],
+      },
+      {
+        title: 'View',
+        id: 'view',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Zoom In',
+            keys: ['Ctrl', '+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['Ctrl', '-'],
+          },
+          {
+            title: 'Reset Zoom',
+            keys: ['Ctrl', '0'],
+          },
+          {
+            title: 'Toggle Fullscreen',
+            keys: ['F11'],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 

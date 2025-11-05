@@ -19,6 +19,22 @@ Rectangle {
         return total
     }
 
+    function refreshLearnedCount() {
+        learnedCount = calculateLearnedCount()
+    }
+
+    // Refresh learned count when view becomes visible
+    onVisibleChanged: {
+        if (visible) {
+            refreshLearnedCount()
+        }
+    }
+
+    // Also refresh on component completion
+    Component.onCompleted: {
+        refreshLearnedCount()
+    }
+
     Button {
         id: backButton
         text: "Back"

@@ -26,8 +26,9 @@ Page {
 
     // New navigation state
     property bool escPressed: false
-    property bool leftArrowHeld: false
-    property bool rightArrowHeld: false
+    property var lastLeftTapTime: 0
+    property var lastRightTapTime: 0
+    property int doubleTapThreshold: 300  // milliseconds
 
     // Debug mode properties
     property bool debugMode: true  // Set to false in production
@@ -355,27 +356,33 @@ Page {
 
             // Handle arrow key navigation FIRST (only when idle, before auto-repeat check)
             if (currentStep === 0) {
-                // LEFT arrow - hold for 2 seconds to SKIP FORWARD
-                if (event.key === Qt.Key_Left) {
-                    if (!event.isAutoRepeat) {
-                        leftArrowHeld = true
-                        leftArrowTimer.restart()
-                        debugInfo = "Left arrow pressed (hold 2s to skip forward)..."
+                // LEFT arrow - double tap to GO PREVIOUS
+                if (event.key === Qt.Key_Left && !event.isAutoRepeat) {
+                    var currentTime = Date.now()
+                    if (currentTime - lastLeftTapTime < doubleTapThreshold) {
+                        debugInfo = "Double LEFT detected! Going to previous..."
+                        skipLeft()  // Double left = previous
+                        lastLeftTapTime = 0  // Reset
+                        keyHandler.forceActiveFocus()
                     } else {
-                        debugInfo = "Left arrow held (timer running)..."
+                        lastLeftTapTime = currentTime
+                        debugInfo = "Left arrow tapped once (tap again quickly for previous)"
                     }
                     event.accepted = true
                     return
                 }
 
-                // RIGHT arrow - hold for 2 seconds to GO BACK
-                if (event.key === Qt.Key_Right) {
-                    if (!event.isAutoRepeat) {
-                        rightArrowHeld = true
-                        rightArrowTimer.restart()
-                        debugInfo = "Right arrow pressed (hold 2s to go back)..."
+                // RIGHT arrow - double tap to SKIP FORWARD
+                if (event.key === Qt.Key_Right && !event.isAutoRepeat) {
+                    var currentTime = Date.now()
+                    if (currentTime - lastRightTapTime < doubleTapThreshold) {
+                        debugInfo = "Double RIGHT detected! Skipping forward..."
+                        skipRight()  // Double right = skip
+                        lastRightTapTime = 0  // Reset
+                        keyHandler.forceActiveFocus()
                     } else {
-                        debugInfo = "Right arrow held (timer running)..."
+                        lastRightTapTime = currentTime
+                        debugInfo = "Right arrow tapped once (tap again quickly for skip)"
                     }
                     event.accepted = true
                     return
@@ -431,7 +438,24 @@ Page {
                 attemptedKeys[currentIndex].keypressed = keyText
                 attemptedKeys[currentIndex].color = keyColors
 
-                debugInfo = "Sequence complete! " + (isallkeys ? "WRONG" : "CORRECT")
+                // Record this attempt with userDataManager
+                var success = !isallkeys  // true if no red keys
+                var shortcutId = appsdata.test[currentIndex].id || String(currentIndex)
+                var categoryId = appsdata.id || "unknown"
+
+                if (userDataManager.currentUser !== "") {
+                    userDataManager.recordShortcutAttempt(
+                        appsdata.id || "unknown",
+                        categoryId,
+                        shortcutId,
+                        success,
+                        mode === "test"
+                    )
+                    debugInfo = "Recorded: " + (success ? "✓ CORRECT" : "✗ WRONG") + " for " + shortcutId
+                } else {
+                    debugInfo = "Sequence complete! " + (isallkeys ? "WRONG" : "CORRECT")
+                }
+
                 showResult(true)
                 nextShortcutTimer.start()
             }
@@ -451,22 +475,7 @@ Page {
                 return
             }
 
-            // Cancel arrow key navigation if released early
-            if (event.key === Qt.Key_Left && leftArrowHeld) {
-                leftArrowHeld = false
-                leftArrowTimer.stop()
-                debugInfo = "Left arrow released (cancelled navigation)"
-                event.accepted = true
-                return
-            }
-
-            if (event.key === Qt.Key_Right && rightArrowHeld) {
-                rightArrowHeld = false
-                rightArrowTimer.stop()
-                debugInfo = "Right arrow released (cancelled navigation)"
-                event.accepted = true
-                return
-            }
+            // Arrow key released - no action needed for double-tap mode
 
             const releasedKey = Object.keys(activeKeys).find(key =>
                 (key === "Ctrl" && !(event.modifiers & Qt.ControlModifier)) ||
@@ -653,7 +662,7 @@ Page {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Hold LEFT arrow 2s to skip • Hold RIGHT arrow 2s for previous • ESC+SPACE to exit"
+                text: "Double tap LEFT for previous • Double tap RIGHT to skip • ESC+SPACE to exit"
                 font.pixelSize: 11
                 color: "#888888"
             }
@@ -676,7 +685,7 @@ Page {
                     }
 
                     contentItem: Text {
-                        text: "Skip (→ 2s)"
+                        text: "Skip (→→)"
                         font.pixelSize: 12
                         font.bold: true
                         color: parent.parent.enabled ? "#ffffff" : "#666644"
@@ -808,22 +817,17 @@ Page {
                             color: "#6fda00"
                         }
                         Text {
-                            text: "  Hold LEFT arrow 2s - Skip to next question"
+                            text: "  Double tap LEFT arrow - Go to previous question"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
-                            text: "  Hold RIGHT arrow 2s - Go to previous question"
+                            text: "  Double tap RIGHT arrow - Skip to next question"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
                         Text {
                             text: "  ESC+SPACE - Exit and view analysis"
-                            font.pixelSize: 13
-                            color: "#cccccc"
-                        }
-                        Text {
-                            text: "  Release arrow early - Cancel navigation"
                             font.pixelSize: 13
                             color: "#cccccc"
                         }
@@ -892,34 +896,6 @@ Page {
         onTriggered: advanceShortcut()
     }
 
-    // Timer for left arrow hold (2 seconds) - LEFT = SKIP FORWARD
-    Timer {
-        id: leftArrowTimer
-        interval: 2000
-        onTriggered: {
-            if (leftArrowHeld && currentStep === 0) {
-                debugInfo = "Left arrow held 2s! Skipping forward..."
-                skipRight()  // LEFT arrow skips forward
-                leftArrowHeld = false
-                keyHandler.forceActiveFocus()  // Restore focus after navigation
-            }
-        }
-    }
-
-    // Timer for right arrow hold (2 seconds) - RIGHT = GO BACK
-    Timer {
-        id: rightArrowTimer
-        interval: 2000
-        onTriggered: {
-            if (rightArrowHeld && currentStep === 0) {
-                debugInfo = "Right arrow held 2s! Going back..."
-                skipLeft()  // RIGHT arrow goes back
-                rightArrowHeld = false
-                keyHandler.forceActiveFocus()  // Restore focus after navigation
-            }
-        }
-    }
-
     // Debug overlay (only shown if debugMode is true)
     Rectangle {
         visible: debugMode
@@ -960,14 +936,14 @@ Page {
                 color: "#ffffff"
             }
             Text {
-                text: "Left Arrow: " + (leftArrowHeld ? "HELD" : "Released")
+                text: "Left Double-Tap: " + (lastLeftTapTime > 0 ? "READY" : "Waiting")
                 font.pixelSize: 11
-                color: leftArrowHeld ? "#ffff00" : "#888888"
+                color: lastLeftTapTime > 0 ? "#ffff00" : "#888888"
             }
             Text {
-                text: "Right Arrow: " + (rightArrowHeld ? "HELD" : "Released")
+                text: "Right Double-Tap: " + (lastRightTapTime > 0 ? "READY" : "Waiting")
                 font.pixelSize: 11
-                color: rightArrowHeld ? "#ffff00" : "#888888"
+                color: lastRightTapTime > 0 ? "#ffff00" : "#888888"
             }
             Text {
                 text: "Esc Pressed: " + (escPressed ? "YES" : "NO")

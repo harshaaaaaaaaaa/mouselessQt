@@ -15,7 +15,7 @@ GlobalShortcuts::GlobalShortcuts(QObject *parent)
 #endif
 {
 #ifdef Q_OS_LINUX
-    m_display = XOpenDisplay(nullptr);
+    m_display = static_cast<void*>(XOpenDisplay(nullptr));
     if (!m_display) {
         qWarning() << "Failed to open X11 display for global shortcuts";
         m_enabled = false;
@@ -37,7 +37,7 @@ GlobalShortcuts::~GlobalShortcuts()
 
 #ifdef Q_OS_LINUX
     if (m_display) {
-        XCloseDisplay(m_display);
+        XCloseDisplay(static_cast<Display*>(m_display));
     }
 #endif
 }
@@ -239,7 +239,7 @@ unsigned int GlobalShortcuts::nativeKeycode(Qt::Key key)
         break;
     }
 
-    return XKeysymToKeycode(m_display, keysym);
+    return XKeysymToKeycode(static_cast<Display*>(m_display), keysym);
 }
 
 unsigned int GlobalShortcuts::nativeModifiers(Qt::KeyboardModifiers modifiers)
@@ -260,26 +260,28 @@ unsigned int GlobalShortcuts::nativeModifiers(Qt::KeyboardModifiers modifiers)
 
 void GlobalShortcuts::grabKey(unsigned int keycode, unsigned int modifiers)
 {
-    Window root = DefaultRootWindow(m_display);
+    Display *display = static_cast<Display*>(m_display);
+    Window root = DefaultRootWindow(display);
 
     // Grab with NumLock, CapsLock, and ScrollLock in various states
-    XGrabKey(m_display, keycode, modifiers, root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(m_display, keycode, modifiers | Mod2Mask, root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(m_display, keycode, modifiers | LockMask, root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(m_display, keycode, modifiers | Mod2Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
+    XGrabKey(display, keycode, modifiers, root, True, GrabModeAsync, GrabModeAsync);
+    XGrabKey(display, keycode, modifiers | Mod2Mask, root, True, GrabModeAsync, GrabModeAsync);
+    XGrabKey(display, keycode, modifiers | LockMask, root, True, GrabModeAsync, GrabModeAsync);
+    XGrabKey(display, keycode, modifiers | Mod2Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
 
-    XSync(m_display, False);
+    XSync(display, False);
 }
 
 void GlobalShortcuts::ungrabKey(unsigned int keycode, unsigned int modifiers)
 {
-    Window root = DefaultRootWindow(m_display);
+    Display *display = static_cast<Display*>(m_display);
+    Window root = DefaultRootWindow(display);
 
-    XUngrabKey(m_display, keycode, modifiers, root);
-    XUngrabKey(m_display, keycode, modifiers | Mod2Mask, root);
-    XUngrabKey(m_display, keycode, modifiers | LockMask, root);
-    XUngrabKey(m_display, keycode, modifiers | Mod2Mask | LockMask, root);
+    XUngrabKey(display, keycode, modifiers, root);
+    XUngrabKey(display, keycode, modifiers | Mod2Mask, root);
+    XUngrabKey(display, keycode, modifiers | LockMask, root);
+    XUngrabKey(display, keycode, modifiers | Mod2Mask | LockMask, root);
 
-    XSync(m_display, False);
+    XSync(display, False);
 }
 #endif

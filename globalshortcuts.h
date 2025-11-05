@@ -6,11 +6,6 @@
 #include <QKeySequence>
 #include <QAbstractNativeEventFilter>
 
-#ifdef Q_OS_LINUX
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#endif
-
 class GlobalShortcuts : public QObject, public QAbstractNativeEventFilter
 {
     Q_OBJECT
@@ -54,7 +49,7 @@ private:
     unsigned int nativeModifiers(Qt::KeyboardModifiers modifiers);
     void grabKey(unsigned int keycode, unsigned int modifiers);
     void ungrabKey(unsigned int keycode, unsigned int modifiers);
-    Display *m_display;
+    void *m_display;  // Display* stored as void* to avoid X11 headers in header file
 #endif
 
     bool m_enabled;

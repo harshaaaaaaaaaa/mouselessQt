@@ -632,6 +632,31 @@ int UserDataManager::getUnlockedCount(const QString &appId, const QString &categ
     return unlockedCount;
 }
 
+int UserDataManager::getLearnedCount(const QString &appId, const QString &categoryId)
+{
+    if (m_currentUser.isEmpty()) {
+        return 0;
+    }
+
+    QVariantMap appProgress = m_userData.value("appProgress").toMap();
+    QVariantMap appData = appProgress.value(appId).toMap();
+    QVariantMap shortcutStats = appData.value("shortcutStats").toMap();
+    QVariantMap categoryStats = shortcutStats.value(categoryId).toMap();
+
+    int learnedCount = 0;
+    for (const QString &shortcutId : categoryStats.keys()) {
+        QVariantMap stats = categoryStats.value(shortcutId).toMap();
+        QString level = stats.value("level", "new").toString();
+
+        // Count only learned shortcuts (80%+ success rate)
+        if (level == "learned") {
+            learnedCount++;
+        }
+    }
+
+    return learnedCount;
+}
+
 QJsonObject UserDataManager::variantMapToJson(const QVariantMap &map)
 {
     QJsonObject obj;

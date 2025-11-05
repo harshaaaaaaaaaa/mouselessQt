@@ -7,6 +7,17 @@ Rectangle {
     required property var appsdata
     required property StackView stackView
     property int donecount: 0
+    property int learnedCount: calculateLearnedCount()
+
+    function calculateLearnedCount() {
+        var total = 0
+        if (appsdata.sets) {
+            for (var i = 0; i < appsdata.sets.length; i++) {
+                total += userDataManager.getLearnedCount(appsdata.id, appsdata.sets[i].id)
+            }
+        }
+        return total
+    }
 
     Button {
         id: backButton
@@ -68,35 +79,70 @@ Rectangle {
             anchors {
                 top: logo.bottom
             }
-            Button{
-                id: testButton
-                text: "Test your learning"
-                font { pixelSize: testButton.height/3; bold: true }
-                height:parent.height/3
-                width:parent.width/10
+
+            Text {
+                id: keysets
+                text: "KeySets"
+                color: "#969292"
+                font { pixelSize: parent.height/5; bold: true }
                 anchors{
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    bottom: parent.bottom
+                    leftMargin: parent.height/10
+                    bottomMargin: parent.height/5
+                }
+            }
+
+            // Progressive unlocking indicator
+            Text {
+                id: unlockProgress
+                visible: learnedCount < 20
+                text: "🔒 Learn " + learnedCount + "/20 shortcuts to unlock Quiz"
+                color: "#ffaa00"
+                font { pixelSize: parent.height/6; bold: true }
+                anchors {
+                    right: testButton.left
+                    rightMargin: 20
+                    verticalCenter: parent.verticalCenter
+                }
+            }
+
+            Button {
+                id: testButton
+                text: learnedCount >= 20 ? "Test your learning" : "🔒 Locked"
+                enabled: learnedCount >= 20
+                font { pixelSize: testButton.height/3; bold: true }
+                height: parent.height/3
+                width: parent.width/10
+                anchors{
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
                 }
 
-                onClicked: stackView.push("Testground.qml", {
-                            appsdata:appsdata,
+                background: Rectangle {
+                    color: testButton.enabled ? (testButton.hovered ? "#6fda00" : "#5ac300") : "#3a3a3a"
+                    radius: 8
+                    border.color: testButton.enabled ? "#6fda00" : "#555555"
+                    border.width: 2
+                }
+
+                contentItem: Text {
+                    text: testButton.text
+                    font: testButton.font
+                    color: testButton.enabled ? "#000000" : "#777777"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    if (learnedCount >= 20) {
+                        stackView.push("Testground.qml", {
+                            appsdata: appsdata,
                             stackView: stackView
                         })
-              }
-
-              Text {
-                  id:keysets
-                  text:"KeySets"
-                  color:"#969292"
-                  font { pixelSize: parent.height/5; bold: true }
-                  anchors{
-                          left: parent.left
-                          bottom: parent.bottom
-                          leftMargin: parent.height/10
-                          bottomMargin:parent.height/5
-                  }
-              }
+                    }
+                }
+            }
         }
         Rectangle{
             color:"#070707"

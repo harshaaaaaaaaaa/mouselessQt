@@ -49,6 +49,42 @@ Rectangle {
 
             Item { Layout.fillWidth: true }
 
+            // Lookup button
+            Button {
+                Layout.preferredWidth: 130
+                Layout.preferredHeight: 40
+
+                background: Rectangle {
+                    color: parent.hovered ? "#6fda00" : "#1a1a1a"
+                    radius: 8
+                    border.color: "#6fda00"
+                    border.width: 1
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
+                }
+
+                contentItem: Text {
+                    text: "📖 Lookup"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: parent.parent.hovered ? "#000000" : "#6fda00"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
+                }
+
+                onClicked: {
+                    stackView.push("LookupView.qml", {
+                        stackView: stackView
+                    })
+                }
+            }
+
             // Settings button
             Button {
                 Layout.preferredWidth: 110

@@ -65,6 +65,7 @@ public:
                                              const QString &categoryId,
                                              const QString &shortcutId);
     Q_INVOKABLE int getUnlockedCount(const QString &appId, const QString &categoryId);
+    Q_INVOKABLE int getLearnedCount(const QString &appId, const QString &categoryId);
 
     // Session state management
     Q_INVOKABLE void saveSessionState(const QString &appId,

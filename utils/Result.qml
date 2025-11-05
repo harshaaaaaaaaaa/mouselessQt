@@ -117,7 +117,7 @@ Rectangle{
 
     Row {
           visible: true
-          spacing: parent.width/2
+          spacing: 20
           anchors{
                  top: headerBar.bottom
                  topMargin: 30
@@ -157,6 +157,61 @@ Rectangle{
                 font.bold: true
                 font.pixelSize: 14
                 color:"#000000"
+             }
+         }
+
+         // Retry Failed Shortcuts Button
+         Rectangle{
+                  id: retryButton
+                  height:45
+                  width:160
+                  radius: 8
+                  color: retryMouseArea.containsMouse ? "#ff5555" : "#ff4444"
+                  visible: wrongkey > 0
+
+                  MouseArea {
+                      id: retryMouseArea
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      onClicked: {
+                          // Filter only failed shortcuts
+                          var failedShortcuts = []
+                          for (var i = 0; i < attemptedKeys.length; i++) {
+                              if (attemptedKeys[i].attempt === true && attemptedKeys[i].correct === false) {
+                                  // Find original shortcut data
+                                  for (var j = 0; j < appsdata.shortcuts.length; j++) {
+                                      if (appsdata.shortcuts[j].title === attemptedKeys[i].title) {
+                                          failedShortcuts.push(appsdata.shortcuts[j])
+                                          break
+                                      }
+                                  }
+                              }
+                          }
+
+                          // Start new test with only failed shortcuts
+                          if (failedShortcuts.length > 0) {
+                              var retryData = {
+                                  id: appsdata.id,
+                                  title: appsdata.title,
+                                  test: appsdata.test,
+                                  shortcuts: failedShortcuts,
+                                  isRetry: true
+                              }
+
+                              stackView.push("Testground.qml", {
+                                  appsdata: retryData,
+                                  stackView: stackView
+                              })
+                          }
+                      }
+                  }
+
+           Text {
+                anchors.centerIn: parent
+                text: "🔄 Retry Failed (" + wrongkey + ")"
+                font.bold: true
+                font.pixelSize: 13
+                color:"#ffffff"
              }
          }
        }

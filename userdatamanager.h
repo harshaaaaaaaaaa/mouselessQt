@@ -53,6 +53,19 @@ public:
     Q_INVOKABLE QVariantList getPracticeHistory(const QString &appId);
     Q_INVOKABLE QVariantMap getOverallStats();
 
+    // Weighted learning algorithm
+    Q_INVOKABLE QVariantMap getWeightedShortcut(const QString &appId,
+                                                 const QString &categoryId,
+                                                 const QVariantList &allShortcuts);
+    Q_INVOKABLE void updateShortcutLevel(const QString &appId,
+                                         const QString &categoryId,
+                                         const QString &shortcutId,
+                                         bool success);
+    Q_INVOKABLE QVariantMap getShortcutStats(const QString &appId,
+                                             const QString &categoryId,
+                                             const QString &shortcutId);
+    Q_INVOKABLE int getUnlockedCount(const QString &appId, const QString &categoryId);
+
     // Session state management
     Q_INVOKABLE void saveSessionState(const QString &appId,
                                        const QString &sessionType,

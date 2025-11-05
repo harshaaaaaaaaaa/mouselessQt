@@ -3,7 +3,8 @@
 #include <QGuiApplication>
 
 #ifdef Q_OS_LINUX
-#include <QX11Info>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 #include <xcb/xcb.h>
 #endif
 

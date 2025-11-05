@@ -2319,6 +2319,856 @@ var appsdata=[
               },
   ],
 },
+  {
+    id: 'chrome',
+    appicon: 'qrc:/Images/chrome.png',
+    title: 'Chrome',
+    category: 'Browser',
+    description: 'Google Chrome is a fast, secure web browser. Master these shortcuts to browse faster and become a power user.',
+    sets: [
+      {
+        title: 'Tabs & Windows',
+        id: 'tabs',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Tab',
+            keys: ['Ctrl', 'T'],
+          },
+          {
+            title: 'New Window',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'New Incognito Window',
+            keys: ['Ctrl', 'Shift', 'N'],
+          },
+          {
+            title: 'Close Tab',
+            keys: ['Ctrl', 'W'],
+          },
+          {
+            title: 'Close Window',
+            keys: ['Ctrl', 'Shift', 'W'],
+          },
+          {
+            title: 'Reopen Closed Tab',
+            keys: ['Ctrl', 'Shift', 'T'],
+          },
+          {
+            title: 'Next Tab',
+            keys: ['Ctrl', 'Tab'],
+          },
+          {
+            title: 'Previous Tab',
+            keys: ['Ctrl', 'Shift', 'Tab'],
+          },
+          {
+            title: 'Jump to Tab 1-8',
+            keys: ['Ctrl', '1'],
+          },
+          {
+            title: 'Jump to Last Tab',
+            keys: ['Ctrl', '9'],
+          },
+        ],
+      },
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Back',
+            keys: ['Alt', 'left'],
+          },
+          {
+            title: 'Forward',
+            keys: ['Alt', 'right'],
+          },
+          {
+            title: 'Reload',
+            keys: ['Ctrl', 'R'],
+          },
+          {
+            title: 'Hard Reload',
+            keys: ['Ctrl', 'Shift', 'R'],
+          },
+          {
+            title: 'Home',
+            keys: ['Alt', 'Home'],
+          },
+          {
+            title: 'Focus Address Bar',
+            keys: ['Ctrl', 'L'],
+          },
+          {
+            title: 'Search Tabs',
+            keys: ['Ctrl', 'Shift', 'A'],
+          },
+        ],
+      },
+      {
+        title: 'Page Actions',
+        id: 'page',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Find in Page',
+            keys: ['Ctrl', 'F'],
+          },
+          {
+            title: 'Find Next',
+            keys: ['Ctrl', 'G'],
+          },
+          {
+            title: 'Find Previous',
+            keys: ['Ctrl', 'Shift', 'G'],
+          },
+          {
+            title: 'Save Page',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'Print',
+            keys: ['Ctrl', 'P'],
+          },
+          {
+            title: 'Zoom In',
+            keys: ['Ctrl', '+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['Ctrl', '-'],
+          },
+          {
+            title: 'Reset Zoom',
+            keys: ['Ctrl', '0'],
+          },
+          {
+            title: 'Scroll Down',
+            keys: ['Space'],
+          },
+          {
+            title: 'Scroll Up',
+            keys: ['Shift', 'Space'],
+          },
+        ],
+      },
+      {
+        title: 'Developer Tools',
+        id: 'devtools',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Open DevTools',
+            keys: ['F12'],
+          },
+          {
+            title: 'Inspect Element',
+            keys: ['Ctrl', 'Shift', 'C'],
+          },
+          {
+            title: 'Console',
+            keys: ['Ctrl', 'Shift', 'J'],
+          },
+          {
+            title: 'Sources',
+            keys: ['Ctrl', 'Shift', 'O'],
+          },
+          {
+            title: 'View Source',
+            keys: ['Ctrl', 'U'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'gimp',
+    appicon: 'qrc:/Images/gimp.png',
+    title: 'GIMP',
+    category: 'Graphics',
+    description: 'GIMP is a free and open-source image editor. These shortcuts will speed up your photo editing and design workflow.',
+    sets: [
+      {
+        title: 'File Operations',
+        id: 'file',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Image',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Open Image',
+            keys: ['Ctrl', 'O'],
+          },
+          {
+            title: 'Save',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'Save As',
+            keys: ['Ctrl', 'Shift', 'S'],
+          },
+          {
+            title: 'Export',
+            keys: ['Ctrl', 'Shift', 'E'],
+          },
+          {
+            title: 'Close',
+            keys: ['Ctrl', 'W'],
+          },
+          {
+            title: 'Quit',
+            keys: ['Ctrl', 'Q'],
+          },
+        ],
+      },
+      {
+        title: 'Tools',
+        id: 'tools',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Selection Tool',
+            keys: ['R'],
+          },
+          {
+            title: 'Free Select',
+            keys: ['F'],
+          },
+          {
+            title: 'Fuzzy Select',
+            keys: ['U'],
+          },
+          {
+            title: 'Select by Color',
+            keys: ['Shift', 'O'],
+          },
+          {
+            title: 'Scissors Select',
+            keys: ['I'],
+          },
+          {
+            title: 'Move Tool',
+            keys: ['M'],
+          },
+          {
+            title: 'Crop Tool',
+            keys: ['Shift', 'C'],
+          },
+          {
+            title: 'Rotate Tool',
+            keys: ['Shift', 'R'],
+          },
+          {
+            title: 'Scale Tool',
+            keys: ['Shift', 'T'],
+          },
+          {
+            title: 'Text Tool',
+            keys: ['T'],
+          },
+          {
+            title: 'Fill Tool',
+            keys: ['Shift', 'B'],
+          },
+          {
+            title: 'Gradient Tool',
+            keys: ['G'],
+          },
+          {
+            title: 'Paintbrush',
+            keys: ['P'],
+          },
+          {
+            title: 'Eraser',
+            keys: ['Shift', 'E'],
+          },
+          {
+            title: 'Clone Tool',
+            keys: ['C'],
+          },
+        ],
+      },
+      {
+        title: 'View',
+        id: 'view',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Zoom In',
+            keys: ['+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['-'],
+          },
+          {
+            title: 'Fit in Window',
+            keys: ['Shift', 'Ctrl', 'E'],
+          },
+          {
+            title: 'Zoom 100%',
+            keys: ['1'],
+          },
+          {
+            title: 'Toggle Selection',
+            keys: ['Ctrl', 'T'],
+          },
+          {
+            title: 'Toggle Guides',
+            keys: ['Shift', 'Ctrl', 'T'],
+          },
+          {
+            title: 'Fullscreen',
+            keys: ['F11'],
+          },
+        ],
+      },
+      {
+        title: 'Layers',
+        id: 'layers',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Layer',
+            keys: ['Shift', 'Ctrl', 'N'],
+          },
+          {
+            title: 'Duplicate Layer',
+            keys: ['Shift', 'Ctrl', 'D'],
+          },
+          {
+            title: 'Merge Down',
+            keys: ['Ctrl', 'M'],
+          },
+          {
+            title: 'Flatten Image',
+            keys: ['Ctrl', 'Shift', 'M'],
+          },
+          {
+            title: 'Anchor Layer',
+            keys: ['Ctrl', 'H'],
+          },
+        ],
+      },
+      {
+        title: 'Edit',
+        id: 'edit',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Undo',
+            keys: ['Ctrl', 'Z'],
+          },
+          {
+            title: 'Redo',
+            keys: ['Ctrl', 'Y'],
+          },
+          {
+            title: 'Cut',
+            keys: ['Ctrl', 'X'],
+          },
+          {
+            title: 'Copy',
+            keys: ['Ctrl', 'C'],
+          },
+          {
+            title: 'Paste',
+            keys: ['Ctrl', 'V'],
+          },
+          {
+            title: 'Fill with FG Color',
+            keys: ['Ctrl', ';'],
+          },
+          {
+            title: 'Fill with BG Color',
+            keys: ['Ctrl', ':'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'slack',
+    appicon: 'qrc:/Images/slack.png',
+    title: 'Slack',
+    category: 'Communication',
+    description: 'Slack is a messaging app for teams. Navigate conversations and channels faster with these keyboard shortcuts.',
+    sets: [
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Quick Switcher',
+            keys: ['Ctrl', 'K'],
+          },
+          {
+            title: 'Direct Messages',
+            keys: ['Ctrl', 'Shift', 'K'],
+          },
+          {
+            title: 'All Unreads',
+            keys: ['Ctrl', 'Shift', 'A'],
+          },
+          {
+            title: 'All Threads',
+            keys: ['Ctrl', 'Shift', 'T'],
+          },
+          {
+            title: 'Browse Channels',
+            keys: ['Ctrl', 'Shift', 'L'],
+          },
+          {
+            title: 'Previous Channel',
+            keys: ['Alt', 'up'],
+          },
+          {
+            title: 'Next Channel',
+            keys: ['Alt', 'down'],
+          },
+          {
+            title: 'Previous Unread',
+            keys: ['Alt', 'Shift', 'up'],
+          },
+          {
+            title: 'Next Unread',
+            keys: ['Alt', 'Shift', 'down'],
+          },
+        ],
+      },
+      {
+        title: 'Messaging',
+        id: 'messaging',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Mark as Read',
+            keys: ['Esc'],
+          },
+          {
+            title: 'Mark Channel as Read',
+            keys: ['Esc', 'Esc'],
+          },
+          {
+            title: 'New Message',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Edit Last Message',
+            keys: ['Ctrl', 'up'],
+          },
+          {
+            title: 'Emoji Reactions',
+            keys: ['Ctrl', 'Shift', '\\'],
+          },
+          {
+            title: 'Thread Reply',
+            keys: ['Ctrl', 'Shift', 'T'],
+          },
+          {
+            title: 'Add Formatting',
+            keys: ['Ctrl', 'Shift', 'F'],
+          },
+        ],
+      },
+      {
+        title: 'Search & Files',
+        id: 'search',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Search',
+            keys: ['Ctrl', 'F'],
+          },
+          {
+            title: 'Search Current Channel',
+            keys: ['Ctrl', 'G'],
+          },
+          {
+            title: 'Upload File',
+            keys: ['Ctrl', 'U'],
+          },
+          {
+            title: 'Snippets',
+            keys: ['Ctrl', 'Shift', 'Enter'],
+          },
+        ],
+      },
+      {
+        title: 'Calls & Preferences',
+        id: 'calls',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Toggle Mute',
+            keys: ['M'],
+          },
+          {
+            title: 'Toggle Video',
+            keys: ['V'],
+          },
+          {
+            title: 'Preferences',
+            keys: ['Ctrl', ','],
+          },
+          {
+            title: 'Help',
+            keys: ['Ctrl', '/'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'libreoffice',
+    appicon: 'qrc:/Images/libreoffice.png',
+    title: 'LibreOffice Writer',
+    category: 'Productivity',
+    description: 'LibreOffice Writer is a powerful word processor. These shortcuts will help you format documents and write faster.',
+    sets: [
+      {
+        title: 'Document',
+        id: 'document',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Document',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Open',
+            keys: ['Ctrl', 'O'],
+          },
+          {
+            title: 'Save',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'Save As',
+            keys: ['Ctrl', 'Shift', 'S'],
+          },
+          {
+            title: 'Print',
+            keys: ['Ctrl', 'P'],
+          },
+          {
+            title: 'Close',
+            keys: ['Ctrl', 'W'],
+          },
+          {
+            title: 'Quit',
+            keys: ['Ctrl', 'Q'],
+          },
+        ],
+      },
+      {
+        title: 'Editing',
+        id: 'editing',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Undo',
+            keys: ['Ctrl', 'Z'],
+          },
+          {
+            title: 'Redo',
+            keys: ['Ctrl', 'Y'],
+          },
+          {
+            title: 'Cut',
+            keys: ['Ctrl', 'X'],
+          },
+          {
+            title: 'Copy',
+            keys: ['Ctrl', 'C'],
+          },
+          {
+            title: 'Paste',
+            keys: ['Ctrl', 'V'],
+          },
+          {
+            title: 'Paste Special',
+            keys: ['Ctrl', 'Shift', 'V'],
+          },
+          {
+            title: 'Select All',
+            keys: ['Ctrl', 'A'],
+          },
+          {
+            title: 'Find',
+            keys: ['Ctrl', 'F'],
+          },
+          {
+            title: 'Find & Replace',
+            keys: ['Ctrl', 'H'],
+          },
+        ],
+      },
+      {
+        title: 'Formatting',
+        id: 'formatting',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Bold',
+            keys: ['Ctrl', 'B'],
+          },
+          {
+            title: 'Italic',
+            keys: ['Ctrl', 'I'],
+          },
+          {
+            title: 'Underline',
+            keys: ['Ctrl', 'U'],
+          },
+          {
+            title: 'Strikethrough',
+            keys: ['Alt', 'Shift', '5'],
+          },
+          {
+            title: 'Superscript',
+            keys: ['Ctrl', 'Shift', 'P'],
+          },
+          {
+            title: 'Subscript',
+            keys: ['Ctrl', 'Shift', 'B'],
+          },
+          {
+            title: 'Align Left',
+            keys: ['Ctrl', 'L'],
+          },
+          {
+            title: 'Align Center',
+            keys: ['Ctrl', 'E'],
+          },
+          {
+            title: 'Align Right',
+            keys: ['Ctrl', 'R'],
+          },
+          {
+            title: 'Justify',
+            keys: ['Ctrl', 'J'],
+          },
+        ],
+      },
+      {
+        title: 'Styles & Heading',
+        id: 'styles',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Heading 1',
+            keys: ['Ctrl', '1'],
+          },
+          {
+            title: 'Heading 2',
+            keys: ['Ctrl', '2'],
+          },
+          {
+            title: 'Heading 3',
+            keys: ['Ctrl', '3'],
+          },
+          {
+            title: 'Default Style',
+            keys: ['Ctrl', '0'],
+          },
+          {
+            title: 'Apply Style',
+            keys: ['Ctrl', 'Shift', 'S'],
+          },
+        ],
+      },
+      {
+        title: 'Tables & Objects',
+        id: 'tables',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Insert Table',
+            keys: ['Ctrl', 'F12'],
+          },
+          {
+            title: 'Insert Row Above',
+            keys: ['Alt', 'Insert'],
+          },
+          {
+            title: 'Insert Column Before',
+            keys: ['Ctrl', 'Alt', 'Insert'],
+          },
+          {
+            title: 'Delete Row',
+            keys: ['Ctrl', 'Delete'],
+          },
+          {
+            title: 'Hyperlink',
+            keys: ['Ctrl', 'K'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'terminal',
+    appicon: 'qrc:/Images/terminal.png',
+    title: 'Terminal',
+    category: 'Development',
+    description: 'Master the Linux terminal with these essential shortcuts for faster command-line navigation and editing.',
+    sets: [
+      {
+        title: 'Navigation',
+        id: 'navigation',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Beginning of Line',
+            keys: ['Ctrl', 'A'],
+          },
+          {
+            title: 'End of Line',
+            keys: ['Ctrl', 'E'],
+          },
+          {
+            title: 'Forward One Word',
+            keys: ['Alt', 'F'],
+          },
+          {
+            title: 'Backward One Word',
+            keys: ['Alt', 'B'],
+          },
+          {
+            title: 'Clear Screen',
+            keys: ['Ctrl', 'L'],
+          },
+        ],
+      },
+      {
+        title: 'Editing',
+        id: 'editing',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Delete Word Before Cursor',
+            keys: ['Ctrl', 'W'],
+          },
+          {
+            title: 'Delete to End of Line',
+            keys: ['Ctrl', 'K'],
+          },
+          {
+            title: 'Delete to Beginning',
+            keys: ['Ctrl', 'U'],
+          },
+          {
+            title: 'Paste Last Cut',
+            keys: ['Ctrl', 'Y'],
+          },
+          {
+            title: 'Transpose Characters',
+            keys: ['Ctrl', 'T'],
+          },
+          {
+            title: 'Transpose Words',
+            keys: ['Alt', 'T'],
+          },
+        ],
+      },
+      {
+        title: 'History',
+        id: 'history',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Previous Command',
+            keys: ['Ctrl', 'P'],
+          },
+          {
+            title: 'Next Command',
+            keys: ['Ctrl', 'N'],
+          },
+          {
+            title: 'Search History',
+            keys: ['Ctrl', 'R'],
+          },
+          {
+            title: 'Reverse Search',
+            keys: ['Ctrl', 'S'],
+          },
+          {
+            title: 'End History Search',
+            keys: ['Ctrl', 'G'],
+          },
+        ],
+      },
+      {
+        title: 'Control',
+        id: 'control',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'Interrupt Process',
+            keys: ['Ctrl', 'C'],
+          },
+          {
+            title: 'End of File',
+            keys: ['Ctrl', 'D'],
+          },
+          {
+            title: 'Suspend Process',
+            keys: ['Ctrl', 'Z'],
+          },
+          {
+            title: 'Exit Terminal',
+            keys: ['Ctrl', 'D'],
+          },
+        ],
+      },
+      {
+        title: 'Terminal Window',
+        id: 'window',
+        version: 1,
+        shortcuts: [
+          {
+            title: 'New Tab',
+            keys: ['Ctrl', 'Shift', 'T'],
+          },
+          {
+            title: 'Close Tab',
+            keys: ['Ctrl', 'Shift', 'W'],
+          },
+          {
+            title: 'Next Tab',
+            keys: ['Ctrl', 'PageDown'],
+          },
+          {
+            title: 'Previous Tab',
+            keys: ['Ctrl', 'PageUp'],
+          },
+          {
+            title: 'Copy',
+            keys: ['Ctrl', 'Shift', 'C'],
+          },
+          {
+            title: 'Paste',
+            keys: ['Ctrl', 'Shift', 'V'],
+          },
+          {
+            title: 'Zoom In',
+            keys: ['Ctrl', '+'],
+          },
+          {
+            title: 'Zoom Out',
+            keys: ['Ctrl', '-'],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 

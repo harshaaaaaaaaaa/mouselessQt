@@ -19,6 +19,7 @@ Page {
     property int currentStep: 0
     property var keyColors: []
     property int count: 1
+    property var completedShortcuts: ({})  // Track completed shortcuts
 
     // New navigation state
     property bool escPressed: false
@@ -214,6 +215,23 @@ Page {
     }
 
     function advanceShortcut() {
+        // Check if all shortcuts have been completed at least once
+        var allCompleted = true
+        for (var i = 0; i < appsdata.shortcuts.length; i++) {
+            if (!completedShortcuts[i]) {
+                allCompleted = false
+                break
+            }
+        }
+
+        // If all completed, go back to CategoryView
+        if (allCompleted) {
+            saveSession()
+            stackView.pop()  // Return to CategoryView
+            return
+        }
+
+        // Otherwise, advance to next shortcut
         currentIndex = (currentIndex + 1) % appsdata.shortcuts.length
         count = (((count + 1) % (appsdata.shortcuts.length + 1)) == 0) ? 1 : count + 1
         resetSequence()
@@ -226,8 +244,27 @@ Page {
         resultDisplay.opacity = 1
         if (!success) errorResetTimer.restart()
 
-        // Save practice session
+        // Mark as completed if successful
+        if (success) {
+            var newCompleted = completedShortcuts
+            newCompleted[currentIndex] = true
+            completedShortcuts = newCompleted
+        }
+
+        // Record shortcut attempt with userDataManager
         if (userDataManager.currentUser !== "") {
+            var shortcutId = appsdata.shortcuts[currentIndex].id || String(currentIndex)
+            var categoryId = appsdata.id || "unknown"
+
+            userDataManager.recordShortcutAttempt(
+                appsdata.id || "unknown",
+                categoryId,
+                shortcutId,
+                success,
+                false  // isTestMode = false for learning mode
+            )
+
+            // Also save practice session (legacy)
             userDataManager.savePracticeSession(
                 appsdata.id || "unknown",
                 appsdata.title || "practice",
@@ -450,22 +487,52 @@ Page {
             width: parent.width * 0.85
             spacing: 30
 
-            // Counter
-            Rectangle {
+            // Progress counters
+            RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                width: 80
-                height: 40
-                color: "#151515"
-                radius: 20
-                border.color: "#333333"
-                border.width: 1
+                spacing: 15
 
-                Text {
-                    anchors.centerIn: parent
-                    text: `${count}/${appsdata.shortcuts.length}`
-                    font.pixelSize: 18
-                    font.bold: true
-                    color: "#6fda00"
+                // Current position
+                Rectangle {
+                    width: 80
+                    height: 40
+                    color: "#151515"
+                    radius: 20
+                    border.color: "#333333"
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: `${count}/${appsdata.shortcuts.length}`
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "#6fda00"
+                    }
+                }
+
+                // Completed count
+                Rectangle {
+                    width: completedText.width + 20
+                    height: 40
+                    color: "#1a4d1a"
+                    radius: 20
+                    border.color: "#00ff00"
+                    border.width: 1
+
+                    Text {
+                        id: completedText
+                        anchors.centerIn: parent
+                        text: {
+                            var completed = 0
+                            for (var i = 0; i < appsdata.shortcuts.length; i++) {
+                                if (completedShortcuts[i]) completed++
+                            }
+                            return "✓ " + completed + " done"
+                        }
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: "#00ff00"
+                    }
                 }
             }
 
@@ -475,7 +542,28 @@ Page {
                 text: appsdata.shortcuts[currentIndex].title
                 font.pixelSize: 32
                 font.bold: true
-                color: "#ffffff"
+                color: completedShortcuts[currentIndex] ? "#666666" : "#ffffff"
+
+                Rectangle {
+                    visible: completedShortcuts[currentIndex]
+                    anchors.left: parent.right
+                    anchors.leftMargin: 15
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 70
+                    height: 28
+                    radius: 14
+                    color: "#1a4d1a"
+                    border.color: "#00ff00"
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "✓ Done"
+                        font.pixelSize: 12
+                        font.bold: true
+                        color: "#00ff00"
+                    }
+                }
             }
 
             // Keys row

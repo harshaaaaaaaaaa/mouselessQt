@@ -122,264 +122,269 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         clip: true
+        contentWidth: availableWidth
 
-        ColumnLayout {
-            width: parent.parent.width - 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 25
+        Flickable {
+            contentWidth: parent.width
+            contentHeight: contentColumn.height
 
-            Item { height: 10 }
+            ColumnLayout {
+                id: contentColumn
+                width: Math.min(parent.width - 40, 1400)  // Max width 1400px with margins
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 25
 
-            // Stats hero section
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 120
-                color: "#151515"
-                radius: 16
-                border.color: "#2a2a2a"
-                border.width: 2
+                Item { height: 10 }
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 25
-                    spacing: 30
-
-                    // Title section
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 8
-
-                        Text {
-                            text: "Welcome Back, " + userDataManager.currentUser + "!"
-                            font.pixelSize: 26
-                            font.bold: true
-                            color: "#ffffff"
-                        }
-
-                        Text {
-                            text: "Master keyboard shortcuts from 34 applications"
-                            font.pixelSize: 14
-                            color: "#888888"
-                        }
-                    }
-
-                    // Quick stats
-                    RowLayout {
-                        spacing: 30
-
-                        // Tests completed
-                        ColumnLayout {
-                            spacing: 5
-
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: userDataManager.getOverallStats().totalTests || 0
-                                font.pixelSize: 32
-                                font.bold: true
-                                color: "#6fda00"
-                            }
-
-                            Text {
-                                text: "Tests"
-                                font.pixelSize: 12
-                                color: "#888888"
-                            }
-                        }
-
-                        Rectangle {
-                            width: 1
-                            height: 50
-                            color: "#333333"
-                        }
-
-                        // Average score
-                        ColumnLayout {
-                            spacing: 5
-
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: (userDataManager.getOverallStats().averageScore || 0).toFixed(0) + "%"
-                                font.pixelSize: 32
-                                font.bold: true
-                                color: "#6fda00"
-                            }
-
-                            Text {
-                                text: "Accuracy"
-                                font.pixelSize: 12
-                                color: "#888888"
-                            }
-                        }
-
-                        Rectangle {
-                            width: 1
-                            height: 50
-                            color: "#333333"
-                        }
-
-                        // Progress button
-                        Button {
-                            Layout.preferredWidth: 140
-                            Layout.preferredHeight: 50
-
-                            background: Rectangle {
-                                color: parent.hovered ? "#7feb10" : "#6fda00"
-                                radius: 10
-                                border.color: "#7feb10"
-                                border.width: 2
-
-                                Behavior on color {
-                                    ColorAnimation { duration: 150 }
-                                }
-                            }
-
-                            contentItem: ColumnLayout {
-                                spacing: 2
-
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: "📊"
-                                    font.pixelSize: 20
-                                }
-
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: "Dashboard"
-                                    font.pixelSize: 12
-                                    font.bold: true
-                                    color: "#000000"
-                                }
-                            }
-
-                            onClicked: {
-                                stackView.push("ProgressDashboard.qml", {
-                                    stackView: stackView
-                                })
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Section header
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 15
-
-                Text {
-                    text: "Applications"
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#ffffff"
-                }
-
+                // Stats hero section
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 2
-                    color: "#2a2a2a"
-                    radius: 1
-                }
-
-                Text {
-                    text: appsdata.length + " apps"
-                    font.pixelSize: 14
-                    color: "#888888"
-                }
-            }
-
-            // Apps grid
-            GridLayout {
-                Layout.fillWidth: true
-                columns: 4
-                rowSpacing: 20
-                columnSpacing: 20
-
-            Repeater {
-                model: appsdata
-
-                Rectangle {
-                    Layout.preferredWidth: 160
-                    Layout.preferredHeight: 180
-                    color: mouseArea.containsMouse ? "#252525" : "#151515"
+                    Layout.preferredHeight: 120
+                    color: "#151515"
                     radius: 16
-                    border.color: mouseArea.containsMouse ? "#6fda00" : "#2a2a2a"
+                    border.color: "#2a2a2a"
                     border.width: 2
 
-                    Behavior on color {
-                        ColorAnimation { duration: 150 }
-                    }
-                    Behavior on border.color {
-                        ColorAnimation { duration: 150 }
-                    }
-                    Behavior on scale {
-                        NumberAnimation { duration: 100; easing.type: Easing.OutQuad }
-                    }
-
-                    scale: mouseArea.pressed ? 0.95 : 1.0
-
-                    MouseArea {
-                        id: mouseArea
+                    RowLayout {
                         anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            stackView.push("CategoryView.qml", {
-                                appsdata: modelData,
-                                stackView: stackView
-                            })
-                        }
-                    }
+                        anchors.margins: 25
+                        spacing: 30
 
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 15
-                        spacing: 12
-
-                        // App icon
-                        Image {
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.preferredWidth: 80
-                            Layout.preferredHeight: 80
-                            source: modelData.appicon
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
-                        }
-
-                        // App name
-                        Text {
-                            Layout.alignment: Qt.AlignHCenter
+                        // Title section
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            text: modelData.title
-                            font.pixelSize: 16
-                            font.bold: true
-                            color: "#ffffff"
-                            horizontalAlignment: Text.AlignHCenter
-                            elide: Text.ElideRight
-                        }
-
-                        // Category badge
-                        Rectangle {
-                            Layout.alignment: Qt.AlignHCenter
-                            width: childText.width + 16
-                            height: 24
-                            radius: 12
-                            color: "#1a1a1a"
-                            border.color: "#6fda00"
-                            border.width: 1
+                            spacing: 8
 
                             Text {
-                                id: childText
-                                anchors.centerIn: parent
-                                text: modelData.category || "App"
-                                font.pixelSize: 10
+                                text: "Welcome Back, " + userDataManager.currentUser + "!"
+                                font.pixelSize: 26
                                 font.bold: true
-                                color: "#6fda00"
+                                color: "#ffffff"
+                            }
+
+                            Text {
+                                text: "Master keyboard shortcuts from 34 applications"
+                                font.pixelSize: 14
+                                color: "#888888"
+                            }
+                        }
+
+                        // Quick stats
+                        RowLayout {
+                            spacing: 30
+
+                            // Tests completed
+                            ColumnLayout {
+                                spacing: 5
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: userDataManager.getOverallStats().totalTests || 0
+                                    font.pixelSize: 32
+                                    font.bold: true
+                                    color: "#6fda00"
+                                }
+
+                                Text {
+                                    text: "Tests"
+                                    font.pixelSize: 12
+                                    color: "#888888"
+                                }
+                            }
+
+                            Rectangle {
+                                width: 1
+                                height: 50
+                                color: "#333333"
+                            }
+
+                            // Average score
+                            ColumnLayout {
+                                spacing: 5
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: (userDataManager.getOverallStats().averageScore || 0).toFixed(0) + "%"
+                                    font.pixelSize: 32
+                                    font.bold: true
+                                    color: "#6fda00"
+                                }
+
+                                Text {
+                                    text: "Accuracy"
+                                    font.pixelSize: 12
+                                    color: "#888888"
+                                }
+                            }
+
+                            Rectangle {
+                                width: 1
+                                height: 50
+                                color: "#333333"
+                            }
+
+                            // Progress button
+                            Button {
+                                Layout.preferredWidth: 140
+                                Layout.preferredHeight: 50
+
+                                background: Rectangle {
+                                    color: parent.hovered ? "#7feb10" : "#6fda00"
+                                    radius: 10
+                                    border.color: "#7feb10"
+                                    border.width: 2
+
+                                    Behavior on color {
+                                        ColorAnimation { duration: 150 }
+                                    }
+                                }
+
+                                contentItem: ColumnLayout {
+                                    spacing: 2
+
+                                    Text {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: "📊"
+                                        font.pixelSize: 20
+                                    }
+
+                                    Text {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: "Dashboard"
+                                        font.pixelSize: 12
+                                        font.bold: true
+                                        color: "#000000"
+                                    }
+                                }
+
+                                onClicked: {
+                                    stackView.push("ProgressDashboard.qml", {
+                                        stackView: stackView
+                                    })
+                                }
                             }
                         }
                     }
                 }
+
+                // Section header
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 15
+
+                    Text {
+                        text: "Applications"
+                        font.pixelSize: 20
+                        font.bold: true
+                        color: "#ffffff"
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 2
+                        color: "#2a2a2a"
+                        radius: 1
+                    }
+
+                    Text {
+                        text: appsdata.length + " apps"
+                        font.pixelSize: 14
+                        color: "#888888"
+                    }
+                }
+
+                // Apps grid - using Flow for responsive layout
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 20
+
+                    Repeater {
+                        model: appsdata
+
+                        Rectangle {
+                            width: 180
+                            height: 200
+                            color: mouseArea.containsMouse ? "#252525" : "#151515"
+                            radius: 16
+                            border.color: mouseArea.containsMouse ? "#6fda00" : "#2a2a2a"
+                            border.width: 2
+
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                            Behavior on border.color {
+                                ColorAnimation { duration: 150 }
+                            }
+                            Behavior on scale {
+                                NumberAnimation { duration: 100; easing.type: Easing.OutQuad }
+                            }
+
+                            scale: mouseArea.pressed ? 0.95 : 1.0
+
+                            MouseArea {
+                                id: mouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: {
+                                    stackView.push("CategoryView.qml", {
+                                        appsdata: modelData,
+                                        stackView: stackView
+                                    })
+                                }
+                            }
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 15
+                                spacing: 12
+
+                                // App icon
+                                Image {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    Layout.preferredWidth: 80
+                                    Layout.preferredHeight: 80
+                                    source: modelData.appicon
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                }
+
+                                // App name
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    Layout.fillWidth: true
+                                    text: modelData.title
+                                    font.pixelSize: 16
+                                    font.bold: true
+                                    color: "#ffffff"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    elide: Text.ElideRight
+                                }
+
+                                // Category badge
+                                Rectangle {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    width: childText.width + 16
+                                    height: 24
+                                    radius: 12
+                                    color: "#1a1a1a"
+                                    border.color: "#6fda00"
+                                    border.width: 1
+
+                                    Text {
+                                        id: childText
+                                        anchors.centerIn: parent
+                                        text: modelData.category || "App"
+                                        font.pixelSize: 10
+                                        font.bold: true
+                                        color: "#6fda00"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Item { Layout.fillHeight: true; Layout.preferredHeight: 20 }
             }
         }
-
-        Item { Layout.fillHeight: true }
     }
-}

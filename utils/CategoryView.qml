@@ -161,11 +161,11 @@ Rectangle {
                 }
             }
 
-            // Test Mode Button (locked until 20 learned)
+            // Test Mode Button (unlocked)
             Button {
                 id: testButton
-                text: learnedCount >= 20 ? "✓ Test Mode" : "🔒 Locked"
-                enabled: learnedCount >= 20
+                text: "✓ Test Mode"
+                enabled: true
                 font { pixelSize: testButton.height/3; bold: true }
                 height: parent.height/3
                 width: parent.width/10

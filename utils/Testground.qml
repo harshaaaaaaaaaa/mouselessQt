@@ -893,7 +893,10 @@ Page {
     Timer {
         id: nextShortcutTimer
         interval: 1000
-        onTriggered: advanceShortcut()
+        onTriggered: {
+            advanceShortcut()
+            keyHandler.forceActiveFocus()  // Restore focus for next shortcut
+        }
     }
 
     // Debug overlay (only shown if debugMode is true)

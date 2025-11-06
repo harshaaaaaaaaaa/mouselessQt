@@ -658,7 +658,10 @@ Page {
     Timer {
         id: nextShortcutTimer
         interval: 1500
-        onTriggered: advanceShortcut()
+        onTriggered: {
+            advanceShortcut()
+            keyHandler.forceActiveFocus()  // Restore focus for next shortcut
+        }
     }
 
     Timer {

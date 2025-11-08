@@ -12,15 +12,12 @@ Rectangle {
     required property var category
     required property StackView stackView
 
-    // Sequence tracking
-    property int sequenceStep: 0
+    // Key tracking - SIMULTANEOUS pressing (hold all keys together)
     property var expectedKeys: []
-    property var pressedSequence: []
-    property var currentlyPressed: ({})
+    property var currentlyHeld: ({})  // Keys currently being held down
 
     // ESC+SPACE exit tracking
     property bool escPressed: false
-    property bool spacePressed: false
 
     // Test state
     property var testResults: []
@@ -28,7 +25,7 @@ Rectangle {
     property var shuffledShortcuts: []
     property bool isAnswered: false
     property bool isCorrect: false
-    property var wrongSequence: []
+    property var wrongKeys: []
 
     Component.onCompleted: {
         // Shuffle shortcuts
@@ -58,12 +55,10 @@ Rectangle {
     }
 
     function resetState() {
-        sequenceStep = 0
-        pressedSequence = []
-        currentlyPressed = {}
+        currentlyHeld = {}
         isAnswered = false
         isCorrect = false
-        wrongSequence = []
+        wrongKeys = []
         expectedKeys = shuffledShortcuts[currentIndex].shortcut.keys
     }
 
@@ -102,38 +97,74 @@ Rectangle {
         if (key === "down") return "↓"
         if (key === "left") return "←"
         if (key === "right") return "→"
-        return key
+        return key.toUpperCase()
     }
 
-    function checkSequence() {
-        if (sequenceStep >= expectedKeys.length) return false
-        var expected = normalizeKey(expectedKeys[sequenceStep])
-        var pressed = normalizeKey(pressedSequence[sequenceStep])
-        return expected === pressed
-    }
+    function checkIfComplete() {
+        // Check if all expected keys are currently held
+        var heldKeys = Object.keys(currentlyHeld)
 
-    function checkComplete() {
-        // Check if we have all keys in correct sequence
-        if (pressedSequence.length !== expectedKeys.length) return false
+        if (heldKeys.length !== expectedKeys.length) {
+            return false
+        }
 
+        // Check each expected key is held
         for (var i = 0; i < expectedKeys.length; i++) {
-            if (normalizeKey(expectedKeys[i]) !== normalizeKey(pressedSequence[i])) {
+            var expected = normalizeKey(expectedKeys[i])
+            var found = false
+
+            for (var j = 0; j < heldKeys.length; j++) {
+                if (normalizeKey(heldKeys[j]) === expected) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
                 return false
             }
         }
+
         return true
     }
 
-    function advanceSequence() {
-        if (isAnswered) return
+    function checkIfWrong() {
+        // If user is holding more keys than expected, it's wrong
+        var heldKeys = Object.keys(currentlyHeld)
+        if (heldKeys.length > expectedKeys.length) {
+            return true
+        }
 
-        if (checkSequence()) {
-            sequenceStep++
+        // If any held key is not in expected keys, it's wrong
+        for (var i = 0; i < heldKeys.length; i++) {
+            var normalized = normalizeKey(heldKeys[i])
+            var found = false
 
-            // Check if complete
-            if (sequenceStep === expectedKeys.length) {
+            for (var j = 0; j < expectedKeys.length; j++) {
+                if (normalizeKey(expectedKeys[j]) === normalized) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    Timer {
+        id: checkTimer
+        interval: 50
+        repeat: true
+        running: !isAnswered
+        onTriggered: {
+            if (checkIfComplete()) {
                 isAnswered = true
                 isCorrect = true
+                repeat = false
 
                 // Record result
                 var temp = testResults.slice()
@@ -145,22 +176,23 @@ Rectangle {
 
                 userDataManager.recordTestResult(appdata.id, category.id, shuffledShortcuts[currentIndex].id, true)
                 advanceTimer.start()
+            } else if (checkIfWrong() && Object.keys(currentlyHeld).length > 0) {
+                // Wrong keys pressed
+                isAnswered = true
+                isCorrect = false
+                wrongKeys = Object.keys(currentlyHeld)
+                repeat = false
+
+                var temp2 = testResults.slice()
+                temp2.push({
+                    shortcutId: shuffledShortcuts[currentIndex].id,
+                    correct: false
+                })
+                testResults = temp2
+
+                userDataManager.recordTestResult(appdata.id, category.id, shuffledShortcuts[currentIndex].id, false)
+                advanceTimer.start()
             }
-        } else {
-            // Wrong key - record failure
-            isAnswered = true
-            isCorrect = false
-            wrongSequence = pressedSequence.slice()
-
-            var temp2 = testResults.slice()
-            temp2.push({
-                shortcutId: shuffledShortcuts[currentIndex].id,
-                correct: false
-            })
-            testResults = temp2
-
-            userDataManager.recordTestResult(appdata.id, category.id, shuffledShortcuts[currentIndex].id, false)
-            advanceTimer.start()
         }
     }
 
@@ -185,18 +217,11 @@ Rectangle {
             // ESC+SPACE exit
             if (event.key === Qt.Key_Escape) {
                 escPressed = true
-                if (spacePressed) {
-                    stackView.pop()
-                }
+            }
+            if (event.key === Qt.Key_Space && escPressed) {
+                stackView.pop()
                 event.accepted = true
                 return
-            }
-
-            if (event.key === Qt.Key_Space) {
-                spacePressed = true
-                if (escPressed) {
-                    stackView.pop()
-                }
             }
 
             // Don't process if already answered
@@ -206,33 +231,51 @@ Rectangle {
             }
 
             // Convert Qt key to string
-            var keyName = ""
-            if (event.key === Qt.Key_Control) keyName = "Ctrl"
-            else if (event.key === Qt.Key_Shift) keyName = "Shift"
-            else if (event.key === Qt.Key_Alt) keyName = "Alt"
-            else if (event.key === Qt.Key_Meta) keyName = "Meta"
-            else if (event.key === Qt.Key_Up) keyName = "↑"
-            else if (event.key === Qt.Key_Down) keyName = "↓"
-            else if (event.key === Qt.Key_Left) keyName = "←"
-            else if (event.key === Qt.Key_Right) keyName = "→"
-            else if (event.key === Qt.Key_Space) keyName = "Space"
-            else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) keyName = "Enter"
-            else if (event.key === Qt.Key_Tab) keyName = "Tab"
-            else if (event.key === Qt.Key_Backspace) keyName = "Backspace"
-            else if (event.key === Qt.Key_Delete) keyName = "Delete"
-            else if (event.key === Qt.Key_F1) keyName = "F1"
-            else if (event.key === Qt.Key_F2) keyName = "F2"
-            else if (event.key === Qt.Key_F12) keyName = "F12"
-            else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) keyName = String.fromCharCode(event.key)
-            else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) keyName = String.fromCharCode(event.key)
+            var keyStr = ""
+            if (event.key === Qt.Key_Control || event.key === Qt.Key_Meta) {
+                keyStr = "Ctrl"
+            } else if (event.key === Qt.Key_Shift) {
+                keyStr = "Shift"
+            } else if (event.key === Qt.Key_Alt) {
+                keyStr = "Alt"
+            } else if (event.key === Qt.Key_Up) {
+                keyStr = "↑"
+            } else if (event.key === Qt.Key_Down) {
+                keyStr = "↓"
+            } else if (event.key === Qt.Key_Left) {
+                keyStr = "←"
+            } else if (event.key === Qt.Key_Right) {
+                keyStr = "→"
+            } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                keyStr = "Enter"
+            } else if (event.key === Qt.Key_Space) {
+                keyStr = "Space"
+            } else if (event.key === Qt.Key_Tab) {
+                keyStr = "Tab"
+            } else if (event.key === Qt.Key_Backspace) {
+                keyStr = "Backspace"
+            } else if (event.key === Qt.Key_Delete) {
+                keyStr = "Delete"
+            } else if (event.key === Qt.Key_F1) {
+                keyStr = "F1"
+            } else if (event.key === Qt.Key_F2) {
+                keyStr = "F2"
+            } else if (event.key === Qt.Key_F12) {
+                keyStr = "F12"
+            } else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) {
+                keyStr = String.fromCharCode(event.key)
+            } else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+                keyStr = String.fromCharCode(event.key)
+            } else if (event.text.length > 0) {
+                keyStr = event.text
+            }
 
-            if (keyName) {
-                currentlyPressed[keyName] = true
-
-                if (!pressedSequence.includes(keyName)) {
-                    pressedSequence = pressedSequence.concat([keyName])
-                    advanceSequence()
-                }
+            if (keyStr.length > 0) {
+                // Add to currently held keys
+                var newHeld = currentlyHeld
+                newHeld[keyStr] = true
+                currentlyHeld = newHeld
+                currentlyHeldChanged()
             }
 
             event.accepted = true
@@ -242,19 +285,34 @@ Rectangle {
             if (event.key === Qt.Key_Escape) {
                 escPressed = false
             }
-            if (event.key === Qt.Key_Space) {
-                spacePressed = false
+
+            var keyStr = ""
+            if (event.key === Qt.Key_Control || event.key === Qt.Key_Meta) {
+                keyStr = "Ctrl"
+            } else if (event.key === Qt.Key_Shift) {
+                keyStr = "Shift"
+            } else if (event.key === Qt.Key_Alt) {
+                keyStr = "Alt"
+            } else if (event.key === Qt.Key_Up) {
+                keyStr = "↑"
+            } else if (event.key === Qt.Key_Down) {
+                keyStr = "↓"
+            } else if (event.key === Qt.Key_Left) {
+                keyStr = "←"
+            } else if (event.key === Qt.Key_Right) {
+                keyStr = "→"
+            } else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) {
+                keyStr = String.fromCharCode(event.key)
+            } else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+                keyStr = String.fromCharCode(event.key)
             }
 
-            var keyName = ""
-            if (event.key === Qt.Key_Control) keyName = "Ctrl"
-            else if (event.key === Qt.Key_Shift) keyName = "Shift"
-            else if (event.key === Qt.Key_Alt) keyName = "Alt"
-            else if (event.key === Qt.Key_Meta) keyName = "Meta"
-            else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) keyName = String.fromCharCode(event.key)
-
-            if (keyName) {
-                delete currentlyPressed[keyName]
+            if (keyStr.length > 0) {
+                // Remove from currently held
+                var newHeld = currentlyHeld
+                delete newHeld[keyStr]
+                currentlyHeld = newHeld
+                currentlyHeldChanged()
             }
 
             event.accepted = true
@@ -362,7 +420,7 @@ Rectangle {
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 10
-                visible: !isCorrect && wrongSequence.length > 0
+                visible: !isCorrect && wrongKeys.length > 0
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
@@ -376,7 +434,7 @@ Rectangle {
                     spacing: 10
 
                     Repeater {
-                        model: wrongSequence
+                        model: wrongKeys
 
                         RowLayout {
                             spacing: 10
@@ -398,7 +456,7 @@ Rectangle {
                             }
 
                             Text {
-                                visible: index < wrongSequence.length - 1
+                                visible: index < wrongKeys.length - 1
                                 text: "+"
                                 font.pixelSize: 20
                                 color: "#666666"

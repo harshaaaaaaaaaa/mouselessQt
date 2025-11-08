@@ -14,8 +14,7 @@ Rectangle {
     property int currentIndex: 0
     property var currentShortcut: category.shortcuts[currentIndex]
     property var expectedKeys: currentShortcut.keys
-    property int currentStep: 0
-    property var pressedKeys: []
+    property var currentlyHeld: ({})  // Keys currently being held down
     property bool success: false
     property bool failed: false
 
@@ -29,8 +28,7 @@ Rectangle {
     }
 
     function resetState() {
-        currentStep = 0
-        pressedKeys = []
+        currentlyHeld = {}
         success = false
         failed = false
     }
@@ -38,7 +36,6 @@ Rectangle {
     function nextShortcut() {
         currentIndex++
         if (currentIndex >= category.shortcuts.length) {
-            // Done - go back
             stackView.pop()
             return
         }
@@ -54,29 +51,46 @@ Rectangle {
         if (key === "down") return "↓"
         if (key === "left") return "←"
         if (key === "right") return "→"
-        return key
+        return key.toUpperCase()
     }
 
-    function checkKey(keyStr) {
-        if (currentStep >= expectedKeys.length) return false
+    function checkIfComplete() {
+        // Check if all expected keys are currently held
+        var heldKeys = Object.keys(currentlyHeld)
 
-        var expected = normalizeKey(expectedKeys[currentStep])
-        var pressed = normalizeKey(keyStr)
+        if (heldKeys.length !== expectedKeys.length) {
+            return false
+        }
 
-        return expected.toUpperCase() === pressed.toUpperCase()
+        // Check each expected key is held
+        for (var i = 0; i < expectedKeys.length; i++) {
+            var expected = normalizeKey(expectedKeys[i])
+            var found = false
+
+            for (var j = 0; j < heldKeys.length; j++) {
+                if (normalizeKey(heldKeys[j]) === expected) {
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                return false
+            }
+        }
+
+        return true
     }
 
-    function handleKeyPress(keyStr) {
-        if (success) return
-
-        pressedKeys.push(keyStr)
-
-        if (checkKey(keyStr)) {
-            currentStep++
-
-            if (currentStep >= expectedKeys.length) {
-                // Complete!
+    Timer {
+        id: checkTimer
+        interval: 50
+        repeat: true
+        running: !success
+        onTriggered: {
+            if (checkIfComplete()) {
                 success = true
+                repeat = false
 
                 var shortcutId = "shortcut_" + currentIndex
                 if (!learnedIds.includes(shortcutId)) {
@@ -88,10 +102,6 @@ Rectangle {
 
                 advanceTimer.start()
             }
-        } else {
-            // Wrong key
-            failed = true
-            failTimer.start()
         }
     }
 
@@ -105,13 +115,16 @@ Rectangle {
         id: failTimer
         interval: 500
         onTriggered: {
-            resetState()
+            failed = false
         }
     }
 
     focus: true
     Keys.onPressed: {
-        console.log("Key pressed:", event.key, event.text)
+        if (event.isAutoRepeat) {
+            event.accepted = true
+            return
+        }
 
         // ESC+SPACE to exit
         if (event.key === Qt.Key_Escape) {
@@ -165,10 +178,12 @@ Rectangle {
             keyStr = event.text
         }
 
-        console.log("Converted key:", keyStr)
-
         if (keyStr.length > 0) {
-            handleKeyPress(keyStr)
+            // Add to currently held keys
+            var newHeld = currentlyHeld
+            newHeld[keyStr] = true
+            currentlyHeld = newHeld
+            currentlyHeldChanged()
         }
 
         event.accepted = true
@@ -178,191 +193,230 @@ Rectangle {
         if (event.key === Qt.Key_Escape) {
             escPressed = false
         }
+
+        var keyStr = ""
+        if (event.key === Qt.Key_Control || event.key === Qt.Key_Meta) {
+            keyStr = "Ctrl"
+        } else if (event.key === Qt.Key_Shift) {
+            keyStr = "Shift"
+        } else if (event.key === Qt.Key_Alt) {
+            keyStr = "Alt"
+        } else if (event.key === Qt.Key_Up) {
+            keyStr = "↑"
+        } else if (event.key === Qt.Key_Down) {
+            keyStr = "↓"
+        } else if (event.key === Qt.Key_Left) {
+            keyStr = "←"
+        } else if (event.key === Qt.Key_Right) {
+            keyStr = "→"
+        } else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) {
+            keyStr = String.fromCharCode(event.key)
+        } else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+            keyStr = String.fromCharCode(event.key)
+        }
+
+        if (keyStr.length > 0) {
+            // Remove from currently held
+            var newHeld = currentlyHeld
+            delete newHeld[keyStr]
+            currentlyHeld = newHeld
+            currentlyHeldChanged()
+        }
+
         event.accepted = true
     }
 
-    // UI
-    ColumnLayout {
-        anchors.centerIn: parent
-        width: Math.min(parent.width - 80, 900)
-        spacing: 45
+    // Centered main content
+    Item {
+        anchors.fill: parent
 
-        // Header
-        RowLayout {
-            Layout.fillWidth: true
+        ColumnLayout {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 100, 900)
+            spacing: 50
 
-            Button {
-                text: "← Back"
-                font.pixelSize: 14
-                Layout.preferredHeight: 42
+            // Header
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
 
-                background: Rectangle {
-                    color: parent.hovered ? "#252525" : "#1a1a1a"
-                    radius: 8
-                    border.color: "#333333"
-                    border.width: 1
+                Button {
+                    text: "← Back"
+                    font.pixelSize: 14
+                    Layout.preferredHeight: 42
+                    Layout.preferredWidth: 110
+
+                    background: Rectangle {
+                        color: parent.hovered ? "#252525" : "#1a1a1a"
+                        radius: 8
+                        border.color: "#333333"
+                        border.width: 1
+                    }
+
+                    contentItem: Text {
+                        text: parent.text
+                        font: parent.font
+                        color: "#ffffff"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    onClicked: stackView.pop()
                 }
 
-                contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: "#ffffff"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+                Item { Layout.fillWidth: true }
 
-                onClicked: stackView.pop()
+                Text {
+                    text: appdata.title + " · " + category.title
+                    font.pixelSize: 15
+                    color: "#888888"
+                }
             }
 
-            Item { Layout.fillWidth: true }
+            // Progress
+            Rectangle {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 130
+                Layout.preferredHeight: 42
+                color: "#151515"
+                radius: 21
+                border.color: "#333333"
+                border.width: 1
 
+                Text {
+                    anchors.centerIn: parent
+                    text: (currentIndex + 1) + " / " + category.shortcuts.length
+                    font.pixelSize: 17
+                    font.bold: true
+                    color: "#6fda00"
+                }
+            }
+
+            // Title
             Text {
-                text: appdata.title + " · " + category.title
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                Layout.maximumWidth: 700
+                text: currentShortcut.title
+                font.pixelSize: 38
+                font.bold: true
+                color: "#ffffff"
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+            }
+
+            // Instruction
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Press and hold all keys together"
                 font.pixelSize: 15
                 color: "#888888"
+                visible: !success
             }
-        }
 
-        // Progress
-        Rectangle {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 130
-            Layout.preferredHeight: 42
-            color: "#151515"
-            radius: 21
-            border.color: "#333333"
-            border.width: 1
+            // Keys display
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 18
 
-            Text {
-                anchors.centerIn: parent
-                text: (currentIndex + 1) + " / " + category.shortcuts.length
-                font.pixelSize: 17
-                font.bold: true
-                color: "#6fda00"
-            }
-        }
+                Repeater {
+                    model: expectedKeys
 
-        // Title
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.fillWidth: true
-            Layout.maximumWidth: 700
-            text: currentShortcut.title
-            font.pixelSize: 38
-            font.bold: true
-            color: "#ffffff"
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-        }
+                    RowLayout {
+                        spacing: 18
 
-        // Instruction
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            text: currentStep === 0 ? "Press the keys in order:" : "Next: " + expectedKeys[currentStep]
-            font.pixelSize: 15
-            color: "#888888"
-            visible: !success
-        }
-
-        // Keys display
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 18
-
-            Repeater {
-                model: expectedKeys
-
-                RowLayout {
-                    spacing: 18
-
-                    Rectangle {
-                        width: 95
-                        height: 95
-                        color: {
-                            if (success) return "#1a4d1a"
-                            if (index < currentStep) return "#1a4d1a"
-                            if (failed && index === currentStep) return "#4d1a1a"
-                            return "#1a1a1a"
-                        }
-                        radius: 14
-                        border.color: {
-                            if (success) return "#6fda00"
-                            if (failed && index === currentStep) return "#ff4444"
-                            if (index === currentStep) return "#6fda00"
-                            if (index < currentStep) return "#6fda00"
-                            return "#333333"
-                        }
-                        border.width: index === currentStep ? 3 : 2
-
-                        Behavior on color { ColorAnimation { duration: 200 } }
-                        Behavior on border.color { ColorAnimation { duration: 200 } }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: modelData
-                            font.pixelSize: 24
-                            font.bold: true
+                        Rectangle {
+                            width: 95
+                            height: 95
                             color: {
+                                if (success) return "#1a4d1a"
+                                var normalized = normalizeKey(modelData)
+                                var isHeld = false
+                                for (var key in currentlyHeld) {
+                                    if (normalizeKey(key) === normalized) {
+                                        isHeld = true
+                                        break
+                                    }
+                                }
+                                return isHeld ? "#2a4d2a" : "#1a1a1a"
+                            }
+                            radius: 14
+                            border.color: {
                                 if (success) return "#6fda00"
-                                if (index < currentStep) return "#6fda00"
-                                return "#ffffff"
+                                if (failed) return "#ff4444"
+                                var normalized = normalizeKey(modelData)
+                                for (var key in currentlyHeld) {
+                                    if (normalizeKey(key) === normalized) {
+                                        return "#6fda00"
+                                    }
+                                }
+                                return "#333333"
+                            }
+                            border.width: 2
+
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            Behavior on border.color { ColorAnimation { duration: 100 } }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData
+                                font.pixelSize: 24
+                                font.bold: true
+                                color: {
+                                    if (success) return "#6fda00"
+                                    var normalized = normalizeKey(modelData)
+                                    for (var key in currentlyHeld) {
+                                        if (normalizeKey(key) === normalized) {
+                                            return "#6fda00"
+                                        }
+                                    }
+                                    return "#ffffff"
+                                }
                             }
                         }
 
-                        // Checkmark
                         Text {
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 8
-                            text: "✓"
-                            font.pixelSize: 18
+                            visible: index < expectedKeys.length - 1
+                            text: "+"
+                            font.pixelSize: 32
                             font.bold: true
-                            color: "#6fda00"
-                            visible: index < currentStep || success
+                            color: "#555555"
                         }
-                    }
-
-                    Text {
-                        visible: index < expectedKeys.length - 1
-                        text: "+"
-                        font.pixelSize: 32
-                        font.bold: true
-                        color: "#555555"
                     }
                 }
             }
-        }
 
-        // Feedback
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: 45
-            text: {
-                if (success) return "✓ Perfect!"
-                if (failed) return "✗ Wrong key, try again"
-                return ""
+            // Feedback
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: 45
+                text: {
+                    if (success) return "✓ Perfect!"
+                    if (failed) return "✗ Wrong combination"
+                    return ""
+                }
+                font.pixelSize: 26
+                font.bold: true
+                color: success ? "#6fda00" : "#ff4444"
             }
-            font.pixelSize: 26
-            font.bold: true
-            color: success ? "#6fda00" : "#ff4444"
-        }
 
-        // Debug info
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Pressed: " + pressedKeys.join(", ")
-            font.pixelSize: 12
-            color: "#555555"
-            visible: pressedKeys.length > 0
-        }
+            // Currently held keys debug
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Holding: " + Object.keys(currentlyHeld).join(" + ")
+                font.pixelSize: 12
+                color: "#555555"
+                visible: Object.keys(currentlyHeld).length > 0
+            }
 
-        // Exit hint
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 20
-            text: "Press ESC + SPACE to exit"
-            font.pixelSize: 12
-            color: "#555555"
+            // Exit hint
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 20
+                text: "Press ESC + SPACE to exit"
+                font.pixelSize: 12
+                color: "#555555"
+            }
         }
     }
 

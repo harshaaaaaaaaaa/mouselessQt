@@ -6,114 +6,46 @@ Rectangle {
     id: root
     anchors.fill: parent
     color: "#0a0a0a"
-    focus: true
 
     required property var appdata
     required property var category
     required property StackView stackView
 
-    // Strict sequence tracking
-    property int sequenceStep: 0
-    property var expectedKeys: []
-    property var pressedSequence: []  // Tracks keys in order pressed
-    property var currentlyPressed: ({})  // Currently held keys
-
-    // ESC+SPACE exit tracking
-    property bool escPressed: false
-    property bool spacePressed: false
-
-    // Learning state
-    property var trainedIds: []
-    property var learnedIds: []
-    property var skippedIds: []
-    property int currentShortcutIndex: 0
-    property var currentShortcut: null
+    property int currentIndex: 0
+    property var currentShortcut: category.shortcuts[currentIndex]
+    property var expectedKeys: currentShortcut.keys
+    property int currentStep: 0
+    property var pressedKeys: []
     property bool success: false
-    property bool showFailed: false
+    property bool failed: false
 
-    // Computed
-    property var shortcuts: category.shortcuts
-    property bool finished: learnedIds.length > 0 && learnedIds.length === shortcuts.length && skippedIds.length === 0
+    // ESC+SPACE tracking
+    property bool escPressed: false
+
+    property var learnedIds: []
 
     Component.onCompleted: {
-        setNextShortcut()
-        keyHandler.forceActiveFocus()
-    }
-
-    function setNextShortcut() {
-        if (finished) {
-            stackView.pop()
-            return
-        }
-
-        // Weighted random selection (Mouseless pattern)
-        var unseenShortcuts = []
-        var trainedShortcuts = []
-        var learnedShortcuts = []
-
-        for (var i = 0; i < shortcuts.length; i++) {
-            var id = "shortcut_" + i
-            if (skippedIds.includes(id)) continue
-
-            if (!trainedIds.includes(id) && !learnedIds.includes(id)) {
-                unseenShortcuts.push({index: i, shortcut: shortcuts[i], id: id})
-            } else if (trainedIds.includes(id)) {
-                trainedShortcuts.push({index: i, shortcut: shortcuts[i], id: id})
-            } else if (learnedIds.includes(id)) {
-                learnedShortcuts.push({index: i, shortcut: shortcuts[i], id: id})
-            }
-        }
-
-        var shortcutSet = []
-        for (var j = 0; j < 90; j++) shortcutSet = shortcutSet.concat(unseenShortcuts)
-        for (var k = 0; k < 50; k++) shortcutSet = shortcutSet.concat(trainedShortcuts)
-        for (var l = 0; l < 10; l++) shortcutSet = shortcutSet.concat(learnedShortcuts)
-
-        if (shortcutSet.length === 0) {
-            stackView.pop()
-            return
-        }
-
-        var randomIndex = Math.floor(Math.random() * shortcutSet.length)
-        var selected = shortcutSet[randomIndex]
-
-        currentShortcutIndex = selected.index
-        currentShortcut = selected.shortcut
-        expectedKeys = currentShortcut.keys
-
-        resetState()
+        root.forceActiveFocus()
     }
 
     function resetState() {
-        sequenceStep = 0
-        pressedSequence = []
-        currentlyPressed = {}
+        currentStep = 0
+        pressedKeys = []
         success = false
-        showFailed = false
+        failed = false
     }
 
-    function addToTrainedIds(id) {
-        if (!trainedIds.includes(id)) {
-            trainedIds = trainedIds.concat([id])
+    function nextShortcut() {
+        currentIndex++
+        if (currentIndex >= category.shortcuts.length) {
+            // Done - go back
+            stackView.pop()
+            return
         }
-        learnedIds = learnedIds.filter(function(lid) { return lid !== id })
-    }
 
-    function addToLearnedIds(id) {
-        if (!learnedIds.includes(id)) {
-            learnedIds = learnedIds.concat([id])
-        }
-        trainedIds = trainedIds.filter(function(tid) { return tid !== id })
-        userDataManager.recordTeachProgress(appdata.id, category.id, id, true)
-        userDataManager.saveLastPosition(appdata.id, category.id, currentShortcutIndex + 1)
-    }
-
-    function skip() {
-        var id = "shortcut_" + currentShortcutIndex
-        if (!skippedIds.includes(id)) {
-            skippedIds = skippedIds.concat([id])
-        }
-        setNextShortcut()
+        currentShortcut = category.shortcuts[currentIndex]
+        expectedKeys = currentShortcut.keys
+        resetState()
     }
 
     function normalizeKey(key) {
@@ -125,175 +57,144 @@ Rectangle {
         return key
     }
 
-    function checkSequence() {
-        // Check if current step matches expected
-        if (sequenceStep >= expectedKeys.length) return false
+    function checkKey(keyStr) {
+        if (currentStep >= expectedKeys.length) return false
 
-        var expected = normalizeKey(expectedKeys[sequenceStep])
-        var pressed = normalizeKey(pressedSequence[sequenceStep])
+        var expected = normalizeKey(expectedKeys[currentStep])
+        var pressed = normalizeKey(keyStr)
 
-        return expected === pressed
+        return expected.toUpperCase() === pressed.toUpperCase()
     }
 
-    function advanceSequence() {
-        if (checkSequence()) {
-            sequenceStep++
+    function handleKeyPress(keyStr) {
+        if (success) return
 
-            // Check if complete
-            if (sequenceStep === expectedKeys.length) {
+        pressedKeys.push(keyStr)
+
+        if (checkKey(keyStr)) {
+            currentStep++
+
+            if (currentStep >= expectedKeys.length) {
+                // Complete!
                 success = true
-                showFailed = false
 
-                var id = "shortcut_" + currentShortcutIndex
-                var isTest = trainedIds.includes(id) || learnedIds.includes(id)
-
-                if (isTest) {
-                    addToLearnedIds(id)
-                } else {
-                    addToTrainedIds(id)
+                var shortcutId = "shortcut_" + currentIndex
+                if (!learnedIds.includes(shortcutId)) {
+                    learnedIds.push(shortcutId)
                 }
+
+                userDataManager.recordTeachProgress(appdata.id, category.id, shortcutId, true)
+                userDataManager.saveLastPosition(appdata.id, category.id, currentIndex + 1)
 
                 advanceTimer.start()
             }
         } else {
-            // Wrong key - show failed
-            showFailed = true
-            failedTimer.start()
+            // Wrong key
+            failed = true
+            failTimer.start()
         }
     }
 
     Timer {
         id: advanceTimer
         interval: 1000
-        onTriggered: setNextShortcut()
+        onTriggered: nextShortcut()
     }
 
     Timer {
-        id: failedTimer
+        id: failTimer
         interval: 500
         onTriggered: {
-            showFailed = false
             resetState()
         }
     }
 
-    // IPC Key handler - BLOCKS ALL OS SHORTCUTS
-    Item {
-        id: keyHandler
-        anchors.fill: parent
-        focus: true
+    focus: true
+    Keys.onPressed: {
+        console.log("Key pressed:", event.key, event.text)
 
-        Keys.onPressed: {
-            if (event.isAutoRepeat) {
-                event.accepted = true
-                return
-            }
-
-            // ESC+SPACE exit mechanism
-            if (event.key === Qt.Key_Escape) {
-                escPressed = true
-                if (spacePressed) {
-                    stackView.pop()
-                }
-                event.accepted = true
-                return
-            }
-
-            if (event.key === Qt.Key_Space) {
-                spacePressed = true
-                if (escPressed) {
-                    stackView.pop()
-                }
-                // Don't return - Space might be part of shortcut
-            }
-
-            // Don't process if already showing result
-            if (success || advanceTimer.running) {
-                event.accepted = true
-                return
-            }
-
-            // Convert Qt key to string
-            var keyName = ""
-            if (event.key === Qt.Key_Control) keyName = "Ctrl"
-            else if (event.key === Qt.Key_Shift) keyName = "Shift"
-            else if (event.key === Qt.Key_Alt) keyName = "Alt"
-            else if (event.key === Qt.Key_Meta) keyName = "Meta"
-            else if (event.key === Qt.Key_Up) keyName = "↑"
-            else if (event.key === Qt.Key_Down) keyName = "↓"
-            else if (event.key === Qt.Key_Left) keyName = "←"
-            else if (event.key === Qt.Key_Right) keyName = "→"
-            else if (event.key === Qt.Key_Space) keyName = "Space"
-            else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) keyName = "Enter"
-            else if (event.key === Qt.Key_Tab) keyName = "Tab"
-            else if (event.key === Qt.Key_Backspace) keyName = "Backspace"
-            else if (event.key === Qt.Key_Delete) keyName = "Delete"
-            else if (event.key === Qt.Key_F1) keyName = "F1"
-            else if (event.key === Qt.Key_F2) keyName = "F2"
-            else if (event.key === Qt.Key_F12) keyName = "F12"
-            else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) keyName = String.fromCharCode(event.key)
-            else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) keyName = String.fromCharCode(event.key)
-            else keyName = event.text
-
-            if (keyName) {
-                // Add to currently pressed
-                currentlyPressed[keyName] = true
-
-                // Add to sequence if not already there
-                if (!pressedSequence.includes(keyName)) {
-                    pressedSequence = pressedSequence.concat([keyName])
-                    advanceSequence()
-                }
-            }
-
-            // BLOCK ALL KEYS - IPC MODE
+        // ESC+SPACE to exit
+        if (event.key === Qt.Key_Escape) {
+            escPressed = true
+        }
+        if (event.key === Qt.Key_Space && escPressed) {
+            stackView.pop()
             event.accepted = true
+            return
         }
 
-        Keys.onReleased: {
-            // Reset ESC/SPACE flags
-            if (event.key === Qt.Key_Escape) {
-                escPressed = false
-            }
-            if (event.key === Qt.Key_Space) {
-                spacePressed = false
-            }
-
-            // Remove from currently pressed
-            var keyName = ""
-            if (event.key === Qt.Key_Control) keyName = "Ctrl"
-            else if (event.key === Qt.Key_Shift) keyName = "Shift"
-            else if (event.key === Qt.Key_Alt) keyName = "Alt"
-            else if (event.key === Qt.Key_Meta) keyName = "Meta"
-            else if (event.key === Qt.Key_Up) keyName = "↑"
-            else if (event.key === Qt.Key_Down) keyName = "↓"
-            else if (event.key === Qt.Key_Left) keyName = "←"
-            else if (event.key === Qt.Key_Right) keyName = "→"
-            else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) keyName = String.fromCharCode(event.key)
-
-            if (keyName) {
-                delete currentlyPressed[keyName]
-            }
-
+        if (success || advanceTimer.running) {
             event.accepted = true
+            return
         }
+
+        var keyStr = ""
+
+        // Get key string
+        if (event.key === Qt.Key_Control || event.key === Qt.Key_Meta) {
+            keyStr = "Ctrl"
+        } else if (event.key === Qt.Key_Shift) {
+            keyStr = "Shift"
+        } else if (event.key === Qt.Key_Alt) {
+            keyStr = "Alt"
+        } else if (event.key === Qt.Key_Up) {
+            keyStr = "↑"
+        } else if (event.key === Qt.Key_Down) {
+            keyStr = "↓"
+        } else if (event.key === Qt.Key_Left) {
+            keyStr = "←"
+        } else if (event.key === Qt.Key_Right) {
+            keyStr = "→"
+        } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+            keyStr = "Enter"
+        } else if (event.key === Qt.Key_Space) {
+            keyStr = "Space"
+        } else if (event.key === Qt.Key_Tab) {
+            keyStr = "Tab"
+        } else if (event.key === Qt.Key_F1) {
+            keyStr = "F1"
+        } else if (event.key === Qt.Key_F2) {
+            keyStr = "F2"
+        } else if (event.key === Qt.Key_F12) {
+            keyStr = "F12"
+        } else if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z) {
+            keyStr = String.fromCharCode(event.key)
+        } else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+            keyStr = String.fromCharCode(event.key)
+        } else if (event.text.length > 0) {
+            keyStr = event.text
+        }
+
+        console.log("Converted key:", keyStr)
+
+        if (keyStr.length > 0) {
+            handleKeyPress(keyStr)
+        }
+
+        event.accepted = true
     }
 
-    // UI Layout
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Escape) {
+            escPressed = false
+        }
+        event.accepted = true
+    }
+
+    // UI
     ColumnLayout {
         anchors.centerIn: parent
-        width: Math.min(parent.width * 0.9, 800)
-        spacing: 40
+        width: Math.min(parent.width - 80, 900)
+        spacing: 45
 
         // Header
         RowLayout {
             Layout.fillWidth: true
-            spacing: 20
 
             Button {
                 text: "← Back"
                 font.pixelSize: 14
-                Layout.preferredHeight: 40
+                Layout.preferredHeight: 42
 
                 background: Rectangle {
                     color: parent.hovered ? "#252525" : "#1a1a1a"
@@ -317,168 +218,150 @@ Rectangle {
 
             Text {
                 text: appdata.title + " · " + category.title
-                font.pixelSize: 16
+                font.pixelSize: 15
                 color: "#888888"
             }
         }
 
-        // Shortcut title
+        // Progress
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 130
+            Layout.preferredHeight: 42
+            color: "#151515"
+            radius: 21
+            border.color: "#333333"
+            border.width: 1
+
+            Text {
+                anchors.centerIn: parent
+                text: (currentIndex + 1) + " / " + category.shortcuts.length
+                font.pixelSize: 17
+                font.bold: true
+                color: "#6fda00"
+            }
+        }
+
+        // Title
         Text {
             Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
-            text: currentShortcut ? currentShortcut.title : ""
-            font.pixelSize: 36
+            Layout.maximumWidth: 700
+            text: currentShortcut.title
+            font.pixelSize: 38
             font.bold: true
             color: "#ffffff"
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
 
-        // Expected keys - show in sequence order with glow
+        // Instruction
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: currentStep === 0 ? "Press the keys in order:" : "Next: " + expectedKeys[currentStep]
+            font.pixelSize: 15
+            color: "#888888"
+            visible: !success
+        }
+
+        // Keys display
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: 15
+            spacing: 18
 
             Repeater {
                 model: expectedKeys
 
                 RowLayout {
-                    spacing: 15
+                    spacing: 18
 
                     Rectangle {
-                        width: 90
-                        height: 90
+                        width: 95
+                        height: 95
                         color: {
                             if (success) return "#1a4d1a"
-                            if (index < sequenceStep) return "#1a4d1a"  // Already pressed correctly
-                            if (index === sequenceStep && currentlyPressed[normalizeKey(modelData)]) return "#2a4d2a"  // Currently pressing
+                            if (index < currentStep) return "#1a4d1a"
+                            if (failed && index === currentStep) return "#4d1a1a"
                             return "#1a1a1a"
                         }
-                        radius: 12
+                        radius: 14
                         border.color: {
                             if (success) return "#6fda00"
-                            if (showFailed && index === sequenceStep) return "#ff4444"
-                            if (index < sequenceStep) return "#6fda00"  // Already correct
-                            if (index === sequenceStep) return "#6fda00"  // Current step
+                            if (failed && index === currentStep) return "#ff4444"
+                            if (index === currentStep) return "#6fda00"
+                            if (index < currentStep) return "#6fda00"
                             return "#333333"
                         }
-                        border.width: index === sequenceStep ? 3 : 2
+                        border.width: index === currentStep ? 3 : 2
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
-                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
 
                         Text {
                             anchors.centerIn: parent
                             text: modelData
-                            font.pixelSize: 22
+                            font.pixelSize: 24
                             font.bold: true
-                            color: index < sequenceStep ? "#6fda00" : "#ffffff"
+                            color: {
+                                if (success) return "#6fda00"
+                                if (index < currentStep) return "#6fda00"
+                                return "#ffffff"
+                            }
                         }
 
-                        // Checkmark for completed steps
+                        // Checkmark
                         Text {
                             anchors.right: parent.right
                             anchors.top: parent.top
-                            anchors.margins: 5
+                            anchors.margins: 8
                             text: "✓"
-                            font.pixelSize: 16
+                            font.pixelSize: 18
                             font.bold: true
                             color: "#6fda00"
-                            visible: index < sequenceStep
+                            visible: index < currentStep || success
                         }
                     }
 
                     Text {
                         visible: index < expectedKeys.length - 1
                         text: "+"
-                        font.pixelSize: 28
+                        font.pixelSize: 32
                         font.bold: true
-                        color: "#666666"
+                        color: "#555555"
                     }
                 }
             }
         }
 
-        // Sequence instruction
-        Text {
-            Layout.alignment: Qt.AlignHCenter
-            text: {
-                if (success) return ""
-                if (sequenceStep === 0) return "Press keys in order, starting with " + expectedKeys[0]
-                if (sequenceStep < expectedKeys.length) return "Next: press " + expectedKeys[sequenceStep]
-                return ""
-            }
-            font.pixelSize: 14
-            color: "#888888"
-        }
-
         // Feedback
         Text {
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: 40
+            Layout.preferredHeight: 45
             text: {
-                if (success) return "✓ Correct!"
-                if (showFailed) return "✗ Wrong key! Start over"
+                if (success) return "✓ Perfect!"
+                if (failed) return "✗ Wrong key, try again"
                 return ""
             }
-            font.pixelSize: 24
+            font.pixelSize: 26
             font.bold: true
             color: success ? "#6fda00" : "#ff4444"
         }
 
-        // Progress + Skip
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 20
-            spacing: 20
-
-            Rectangle {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 40
-                color: "#151515"
-                radius: 20
-                border.color: "#333333"
-                border.width: 1
-
-                Text {
-                    anchors.centerIn: parent
-                    text: learnedIds.length + " / " + shortcuts.length
-                    font.pixelSize: 16
-                    font.bold: true
-                    color: "#6fda00"
-                }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            Button {
-                text: "Skip →"
-                font.pixelSize: 14
-                Layout.preferredHeight: 40
-                Layout.preferredWidth: 100
-
-                background: Rectangle {
-                    color: parent.hovered ? "#353535" : "#252525"
-                    radius: 8
-                }
-
-                contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: "#888888"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                onClicked: skip()
-            }
+        // Debug info
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Pressed: " + pressedKeys.join(", ")
+            font.pixelSize: 12
+            color: "#555555"
+            visible: pressedKeys.length > 0
         }
 
         // Exit hint
         Text {
             Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 20
             text: "Press ESC + SPACE to exit"
-            font.pixelSize: 11
+            font.pixelSize: 12
             color: "#555555"
         }
     }
@@ -488,8 +371,8 @@ Rectangle {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 20
-        width: 120
-        height: 35
+        width: 130
+        height: 38
         color: "#4d1a1a"
         radius: 8
         border.color: "#ff4444"
@@ -498,7 +381,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             text: "🔒 IPC MODE"
-            font.pixelSize: 11
+            font.pixelSize: 12
             font.bold: true
             color: "#ff4444"
         }

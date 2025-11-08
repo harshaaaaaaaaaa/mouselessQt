@@ -35,46 +35,42 @@ public:
     Q_INVOKABLE bool loadUser(const QString &alias);
     Q_INVOKABLE void refreshUserList();
 
-    // Data operations
-    Q_INVOKABLE void saveTestSession(const QString &appId,
-                                     const QString &categoryId,
-                                     const QVariantList &attemptedKeys,
-                                     int correctKeys,
-                                     int wrongKeys,
-                                     int score);
-
-    Q_INVOKABLE void savePracticeSession(const QString &appId,
-                                         const QString &categoryId,
-                                         const QString &shortcutTitle,
-                                         bool success);
-
-    Q_INVOKABLE QVariantMap getAppProgress(const QString &appId);
-    Q_INVOKABLE QVariantList getTestHistory(const QString &appId);
-    Q_INVOKABLE QVariantList getPracticeHistory(const QString &appId);
-    Q_INVOKABLE QVariantMap getOverallStats();
-
-    // Weighted learning algorithm
-    Q_INVOKABLE QVariantMap getWeightedShortcut(const QString &appId,
-                                                 const QString &categoryId,
-                                                 const QVariantList &allShortcuts);
-    Q_INVOKABLE void updateShortcutLevel(const QString &appId,
+    // Core progress tracking
+    Q_INVOKABLE void recordTeachProgress(const QString &appId,
                                          const QString &categoryId,
                                          const QString &shortcutId,
-                                         bool success);
-    Q_INVOKABLE QVariantMap getShortcutStats(const QString &appId,
-                                             const QString &categoryId,
-                                             const QString &shortcutId);
-    Q_INVOKABLE int getUnlockedCount(const QString &appId, const QString &categoryId);
-    Q_INVOKABLE int getLearnedCount(const QString &appId, const QString &categoryId);
+                                         bool completed);
 
-    // Session state management
-    Q_INVOKABLE void saveSessionState(const QString &appId,
-                                       const QString &sessionType,
-                                       const QVariantMap &sessionData);
-    Q_INVOKABLE QVariantMap loadSessionState(const QString &appId,
-                                             const QString &sessionType);
-    Q_INVOKABLE void clearSessionState(const QString &appId,
-                                       const QString &sessionType);
+    Q_INVOKABLE void recordTestResult(const QString &appId,
+                                      const QString &categoryId,
+                                      const QString &shortcutId,
+                                      bool correct);
+
+    // Progress queries
+    Q_INVOKABLE QVariantMap getCategoryProgress(const QString &appId, const QString &categoryId);
+    Q_INVOKABLE QVariantMap getAppProgress(const QString &appId);
+    Q_INVOKABLE QVariantMap getAllProgress();
+
+    // Test session management
+    Q_INVOKABLE void startTestSession(const QString &appId, const QString &categoryId);
+    Q_INVOKABLE void endTestSession(const QString &appId,
+                                     const QString &categoryId,
+                                     int correct,
+                                     int wrong,
+                                     int total);
+    Q_INVOKABLE QVariantList getTestHistory(const QString &appId, const QString &categoryId, int limit = 3);
+
+    // Last position tracking
+    Q_INVOKABLE void saveLastPosition(const QString &appId,
+                                       const QString &categoryId,
+                                       int shortcutIndex);
+    Q_INVOKABLE QVariantMap getLastPosition();
+
+    // Summary stats
+    Q_INVOKABLE QVariantMap getSummaryStats();
+    Q_INVOKABLE int getTotalShortcutsCompleted();
+    Q_INVOKABLE int getTotalCategoriesCompleted();
+    Q_INVOKABLE double getOverallAccuracy();
 
     // Backup and restore
     Q_INVOKABLE bool createBackup(const QString &backupPath);
@@ -96,7 +92,6 @@ private:
     QString getUserFilePath(const QString &alias) const;
     void initializeUserData(const QString &alias);
     bool saveUserData();
-    void updateStats();
     QJsonObject variantMapToJson(const QVariantMap &map);
     QJsonArray variantListToJson(const QVariantList &list);
     QVariantMap jsonToVariantMap(const QJsonObject &json);

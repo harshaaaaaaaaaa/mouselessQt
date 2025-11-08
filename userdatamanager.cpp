@@ -1,6 +1,5 @@
 #include "userdatamanager.h"
 #include <QDebug>
-#include <QRandomGenerator>
 
 UserDataManager::UserDataManager(QObject *parent)
     : QObject(parent)
@@ -55,7 +54,7 @@ QVariantList UserDataManager::availableUsers() const
     for (const QFileInfo &fileInfo : fileList) {
         QString alias = fileInfo.baseName();
 
-        // Read user file to get additional info
+        // Read user file to get stats
         QFile file(fileInfo.absoluteFilePath());
         if (file.open(QIODevice::ReadOnly)) {
             QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
@@ -66,8 +65,10 @@ QVariantList UserDataManager::availableUsers() const
             userInfo["alias"] = alias;
             userInfo["createdDate"] = obj["createdDate"].toString();
             userInfo["lastActive"] = obj["lastActive"].toString();
-            userInfo["totalTests"] = obj["stats"].toObject()["totalTests"].toInt();
-            userInfo["totalScore"] = obj["stats"].toObject()["totalScore"].toInt();
+
+            QJsonObject stats = obj["stats"].toObject();
+            userInfo["totalTests"] = stats["totalTestsTaken"].toInt();
+            userInfo["totalScore"] = stats["totalShortcutsCompleted"].toInt();
 
             users.append(userInfo);
         }
@@ -99,8 +100,8 @@ bool UserDataManager::createUser(const QString &alias)
     initializeUserData(alias);
 
     if (saveUserData()) {
-        emit successMessage("User created successfully");
-        refreshUserList();
+        emit successMessage("User created successfully: " + alias);
+        emit availableUsersChanged();
         return true;
     }
 
@@ -118,15 +119,8 @@ bool UserDataManager::deleteUser(const QString &alias)
     }
 
     if (file.remove()) {
-        if (m_currentUser == alias) {
-            m_currentUser.clear();
-            m_userData.clear();
-            emit currentUserChanged();
-            emit userDataChanged();
-        }
-
-        emit successMessage("User deleted successfully");
-        refreshUserList();
+        emit successMessage("User deleted: " + alias);
+        emit availableUsersChanged();
         return true;
     }
 
@@ -159,10 +153,8 @@ bool UserDataManager::loadUser(const QString &alias)
     m_userData["lastActive"] = QDateTime::currentDateTime().toString(Qt::ISODate);
     saveUserData();
 
-    emit currentUserChanged();
     emit userDataChanged();
-    emit successMessage("User loaded successfully");
-
+    emit successMessage("Loaded user: " + alias);
     return true;
 }
 
@@ -171,235 +163,267 @@ void UserDataManager::refreshUserList()
     emit availableUsersChanged();
 }
 
-void UserDataManager::saveTestSession(const QString &appId,
-                                      const QString &categoryId,
-                                      const QVariantList &attemptedKeys,
-                                      int correctKeys,
-                                      int wrongKeys,
-                                      int score)
+// Core progress tracking
+void UserDataManager::recordTeachProgress(const QString &appId,
+                                          const QString &categoryId,
+                                          const QString &shortcutId,
+                                          bool completed)
 {
-    if (m_currentUser.isEmpty()) {
-        emit errorOccurred("No user logged in");
-        return;
+    if (m_currentUser.isEmpty()) return;
+
+    QVariantMap progress = m_userData["progress"].toMap();
+    QVariantMap appProgress = progress[appId].toMap();
+    QVariantMap catProgress = appProgress[categoryId].toMap();
+
+    QStringList completedList = catProgress["completed"].toStringList();
+
+    if (completed && !completedList.contains(shortcutId)) {
+        completedList.append(shortcutId);
+        catProgress["completed"] = completedList;
+        appProgress[categoryId] = catProgress;
+        progress[appId] = appProgress;
+        m_userData["progress"] = progress;
+
+        saveUserData();
+        emit userDataChanged();
     }
-
-    QVariantMap session;
-    session["appId"] = appId;
-    session["categoryId"] = categoryId;
-    session["timestamp"] = QDateTime::currentDateTime().toString(Qt::ISODate);
-    session["attemptedKeys"] = attemptedKeys;
-    session["correctKeys"] = correctKeys;
-    session["wrongKeys"] = wrongKeys;
-    session["score"] = score;
-
-    // Get or create appProgress map
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-
-    // Add to test history
-    QVariantList testHistory = appData.value("testHistory").toList();
-    testHistory.append(session);
-    appData["testHistory"] = testHistory;
-
-    // Update app progress
-    appProgress[appId] = appData;
-    m_userData["appProgress"] = appProgress;
-
-    updateStats();
-    saveUserData();
-
-    emit userDataChanged();
 }
 
-void UserDataManager::savePracticeSession(const QString &appId,
-                                          const QString &categoryId,
-                                          const QString &shortcutTitle,
-                                          bool success)
+void UserDataManager::recordTestResult(const QString &appId,
+                                        const QString &categoryId,
+                                        const QString &shortcutId,
+                                        bool correct)
 {
-    if (m_currentUser.isEmpty()) {
-        emit errorOccurred("No user logged in");
-        return;
-    }
+    // Results are accumulated during test session and saved in endTestSession
+}
 
-    QVariantMap session;
-    session["appId"] = appId;
-    session["categoryId"] = categoryId;
-    session["shortcutTitle"] = shortcutTitle;
-    session["timestamp"] = QDateTime::currentDateTime().toString(Qt::ISODate);
-    session["success"] = success;
-
-    // Get or create appProgress map
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-
-    // Add to practice history
-    QVariantList practiceHistory = appData.value("practiceHistory").toList();
-    practiceHistory.append(session);
-    appData["practiceHistory"] = practiceHistory;
-
-    // Update app progress
-    appProgress[appId] = appData;
-    m_userData["appProgress"] = appProgress;
-
-    saveUserData();
-    emit userDataChanged();
+QVariantMap UserDataManager::getCategoryProgress(const QString &appId, const QString &categoryId)
+{
+    QVariantMap progress = m_userData["progress"].toMap();
+    QVariantMap appProgress = progress[appId].toMap();
+    return appProgress[categoryId].toMap();
 }
 
 QVariantMap UserDataManager::getAppProgress(const QString &appId)
 {
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    return appProgress.value(appId).toMap();
+    QVariantMap progress = m_userData["progress"].toMap();
+    return progress[appId].toMap();
 }
 
-QVariantList UserDataManager::getTestHistory(const QString &appId)
+QVariantMap UserDataManager::getAllProgress()
 {
-    QVariantMap appData = getAppProgress(appId);
-    return appData.value("testHistory").toList();
+    return m_userData["progress"].toMap();
 }
 
-QVariantList UserDataManager::getPracticeHistory(const QString &appId)
+// Test session management
+void UserDataManager::startTestSession(const QString &appId, const QString &categoryId)
 {
-    QVariantMap appData = getAppProgress(appId);
-    return appData.value("practiceHistory").toList();
+    // Just track that we started - results saved at end
 }
 
-QVariantMap UserDataManager::getOverallStats()
+void UserDataManager::endTestSession(const QString &appId,
+                                      const QString &categoryId,
+                                      int correct,
+                                      int wrong,
+                                      int total)
 {
-    return m_userData.value("stats").toMap();
+    if (m_currentUser.isEmpty()) return;
+
+    QString sessionKey = appId + "_" + categoryId;
+
+    QVariantMap testHistory = m_userData["testHistory"].toMap();
+    QVariantList sessions = testHistory[sessionKey].toList();
+
+    QVariantMap session;
+    session["date"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    session["correct"] = correct;
+    session["wrong"] = wrong;
+    session["total"] = total;
+    session["accuracy"] = total > 0 ? (correct * 100.0 / total) : 0.0;
+
+    sessions.append(session);
+    testHistory[sessionKey] = sessions;
+    m_userData["testHistory"] = testHistory;
+
+    // Update stats
+    QVariantMap stats = m_userData["stats"].toMap();
+    stats["totalTestsTaken"] = stats["totalTestsTaken"].toInt() + 1;
+    m_userData["stats"] = stats;
+
+    saveUserData();
+    emit userDataChanged();
 }
 
-void UserDataManager::saveSessionState(const QString &appId,
-                                        const QString &sessionType,
-                                        const QVariantMap &sessionData)
+QVariantList UserDataManager::getTestHistory(const QString &appId, const QString &categoryId, int limit)
 {
-    if (m_currentUser.isEmpty()) {
-        return;
+    QString sessionKey = appId + "_" + categoryId;
+    QVariantMap testHistory = m_userData["testHistory"].toMap();
+    QVariantList sessions = testHistory[sessionKey].toList();
+
+    // Return last N sessions
+    if (limit > 0 && sessions.size() > limit) {
+        return sessions.mid(sessions.size() - limit);
     }
+    return sessions;
+}
 
-    // Get or create appProgress map
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
+// Last position tracking
+void UserDataManager::saveLastPosition(const QString &appId,
+                                        const QString &categoryId,
+                                        int shortcutIndex)
+{
+    if (m_currentUser.isEmpty()) return;
 
-    // Save session state under sessionStates key
-    QVariantMap sessionStates = appData.value("sessionStates").toMap();
-    sessionStates[sessionType] = sessionData;
-    appData["sessionStates"] = sessionStates;
+    QVariantMap lastPos;
+    lastPos["appId"] = appId;
+    lastPos["categoryId"] = categoryId;
+    lastPos["shortcutIndex"] = shortcutIndex;
 
-    // Update app progress
-    appProgress[appId] = appData;
-    m_userData["appProgress"] = appProgress;
-
+    m_userData["lastPosition"] = lastPos;
     saveUserData();
 }
 
-QVariantMap UserDataManager::loadSessionState(const QString &appId,
-                                              const QString &sessionType)
+QVariantMap UserDataManager::getLastPosition()
 {
-    QVariantMap appData = getAppProgress(appId);
-    QVariantMap sessionStates = appData.value("sessionStates").toMap();
-    return sessionStates.value(sessionType).toMap();
+    return m_userData["lastPosition"].toMap();
 }
 
-void UserDataManager::clearSessionState(const QString &appId,
-                                        const QString &sessionType)
+// Summary stats
+QVariantMap UserDataManager::getSummaryStats()
 {
-    if (m_currentUser.isEmpty()) {
-        return;
+    return m_userData["stats"].toMap();
+}
+
+int UserDataManager::getTotalShortcutsCompleted()
+{
+    QVariantMap progress = m_userData["progress"].toMap();
+    int total = 0;
+
+    for (const QString &appId : progress.keys()) {
+        QVariantMap appProgress = progress[appId].toMap();
+        for (const QString &catId : appProgress.keys()) {
+            QVariantMap catProgress = appProgress[catId].toMap();
+            total += catProgress["completed"].toStringList().size();
+        }
     }
 
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-    QVariantMap sessionStates = appData.value("sessionStates").toMap();
-
-    // Remove the session state
-    sessionStates.remove(sessionType);
-    appData["sessionStates"] = sessionStates;
-    appProgress[appId] = appData;
-    m_userData["appProgress"] = appProgress;
-
-    saveUserData();
+    return total;
 }
 
+int UserDataManager::getTotalCategoriesCompleted()
+{
+    QVariantMap progress = m_userData["progress"].toMap();
+    int total = 0;
+
+    for (const QString &appId : progress.keys()) {
+        QVariantMap appProgress = progress[appId].toMap();
+        for (const QString &catId : appProgress.keys()) {
+            QVariantMap catProgress = appProgress[catId].toMap();
+            int completed = catProgress["completed"].toStringList().size();
+            int totalShortcuts = catProgress["total"].toInt();
+            if (completed >= totalShortcuts && totalShortcuts > 0) {
+                total++;
+            }
+        }
+    }
+
+    return total;
+}
+
+double UserDataManager::getOverallAccuracy()
+{
+    QVariantMap testHistory = m_userData["testHistory"].toMap();
+    int totalCorrect = 0;
+    int totalAttempts = 0;
+
+    for (const QString &key : testHistory.keys()) {
+        QVariantList sessions = testHistory[key].toList();
+        for (const QVariant &sessionVar : sessions) {
+            QVariantMap session = sessionVar.toMap();
+            totalCorrect += session["correct"].toInt();
+            totalAttempts += session["total"].toInt();
+        }
+    }
+
+    return totalAttempts > 0 ? (totalCorrect * 100.0 / totalAttempts) : 0.0;
+}
+
+// Backup and restore
 bool UserDataManager::createBackup(const QString &backupPath)
 {
     if (m_currentUser.isEmpty()) {
-        emit errorOccurred("No user logged in");
+        emit errorOccurred("No user loaded");
         return false;
     }
 
-    QString path = backupPath;
-    if (path.isEmpty()) {
-        path = getDefaultBackupPath();
-    }
+    QString sourcePath = getUserFilePath(m_currentUser);
+    QFile sourceFile(sourcePath);
 
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)) {
-        emit errorOccurred("Failed to create backup file");
+    if (!sourceFile.exists()) {
+        emit errorOccurred("User file does not exist");
         return false;
     }
 
-    QJsonDocument doc(variantMapToJson(m_userData));
-    file.write(doc.toJson(QJsonDocument::Indented));
-    file.close();
+    if (QFile::exists(backupPath)) {
+        QFile::remove(backupPath);
+    }
 
-    emit successMessage("Backup created successfully at: " + path);
-    return true;
+    if (sourceFile.copy(backupPath)) {
+        emit successMessage("Backup created successfully");
+        return true;
+    }
+
+    emit errorOccurred("Failed to create backup");
+    return false;
 }
 
 bool UserDataManager::restoreBackup(const QString &backupPath)
 {
-    QFile file(backupPath);
+    QFile backupFile(backupPath);
 
-    if (!file.exists()) {
+    if (!backupFile.exists()) {
         emit errorOccurred("Backup file does not exist");
         return false;
     }
 
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!backupFile.open(QIODevice::ReadOnly)) {
         emit errorOccurred("Failed to open backup file");
         return false;
     }
 
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    file.close();
+    QJsonDocument doc = QJsonDocument::fromJson(backupFile.readAll());
+    backupFile.close();
 
-    if (doc.isNull() || !doc.isObject()) {
-        emit errorOccurred("Invalid backup file format");
-        return false;
-    }
-
-    QVariantMap restoredData = jsonToVariantMap(doc.object());
-    QString alias = restoredData.value("alias").toString();
-
+    QString alias = doc.object()["alias"].toString();
     if (alias.isEmpty()) {
-        emit errorOccurred("Backup file does not contain user alias");
+        emit errorOccurred("Invalid backup file");
         return false;
     }
 
-    m_userData = restoredData;
-    m_currentUser = alias;
+    QString destPath = getUserFilePath(alias);
+    QFile destFile(destPath);
 
-    // Update last active time
-    m_userData["lastActive"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    if (destFile.exists()) {
+        destFile.remove();
+    }
 
-    if (saveUserData()) {
-        emit currentUserChanged();
-        emit userDataChanged();
+    if (QFile::copy(backupPath, destPath)) {
         emit successMessage("Backup restored successfully");
-        refreshUserList();
+        loadUser(alias);
         return true;
     }
 
+    emit errorOccurred("Failed to restore backup");
     return false;
 }
 
 QString UserDataManager::getDefaultBackupPath()
 {
     QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-    QString backupDir = m_dataDir.absolutePath() + "/backups";
-    return backupDir + "/" + m_currentUser + "_" + timestamp + ".json";
+    return m_dataDir.absolutePath() + "/backups/" + m_currentUser + "_" + timestamp + ".json";
 }
 
+// Private methods
 QString UserDataManager::getUserFilePath(const QString &alias) const
 {
     return m_dataDir.absolutePath() + "/users/" + alias + ".json";
@@ -411,15 +435,16 @@ void UserDataManager::initializeUserData(const QString &alias)
     m_userData["alias"] = alias;
     m_userData["createdDate"] = QDateTime::currentDateTime().toString(Qt::ISODate);
     m_userData["lastActive"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    m_userData["lastPosition"] = QVariantMap();
+    m_userData["progress"] = QVariantMap();
+    m_userData["testHistory"] = QVariantMap();
 
     QVariantMap stats;
-    stats["totalTests"] = 0;
-    stats["totalScore"] = 0;
-    stats["averageScore"] = 0.0;
-    stats["totalPracticeSessions"] = 0;
+    stats["totalShortcutsCompleted"] = 0;
+    stats["totalCategoriesCompleted"] = 0;
+    stats["totalTestsTaken"] = 0;
+    stats["overallAccuracy"] = 0.0;
     m_userData["stats"] = stats;
-
-    m_userData["appProgress"] = QVariantMap();
 
     m_currentUser = alias;
 }
@@ -434,9 +459,16 @@ bool UserDataManager::saveUserData()
     QFile file(filePath);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        emit errorOccurred("Failed to save user data");
+        qWarning() << "Failed to open file for writing:" << filePath;
         return false;
     }
+
+    // Update stats before saving
+    QVariantMap stats = m_userData["stats"].toMap();
+    stats["totalShortcutsCompleted"] = getTotalShortcutsCompleted();
+    stats["totalCategoriesCompleted"] = getTotalCategoriesCompleted();
+    stats["overallAccuracy"] = getOverallAccuracy();
+    m_userData["stats"] = stats;
 
     QJsonDocument doc(variantMapToJson(m_userData));
     file.write(doc.toJson(QJsonDocument::Indented));
@@ -445,261 +477,63 @@ bool UserDataManager::saveUserData()
     return true;
 }
 
-void UserDataManager::updateStats()
-{
-    QVariantMap stats = m_userData.value("stats").toMap();
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-
-    int totalTests = 0;
-    int totalScore = 0;
-
-    // Calculate totals from all apps
-    for (const QString &appId : appProgress.keys()) {
-        QVariantMap appData = appProgress.value(appId).toMap();
-        QVariantList testHistory = appData.value("testHistory").toList();
-
-        totalTests += testHistory.size();
-
-        for (const QVariant &test : testHistory) {
-            QVariantMap testData = test.toMap();
-            totalScore += testData.value("score").toInt();
-        }
-    }
-
-    stats["totalTests"] = totalTests;
-    stats["totalScore"] = totalScore;
-    stats["averageScore"] = totalTests > 0 ? (double)totalScore / totalTests : 0.0;
-
-    m_userData["stats"] = stats;
-}
-
-// Weighted Learning Algorithm Implementation
-QVariantMap UserDataManager::getWeightedShortcut(const QString &appId,
-                                                   const QString &categoryId,
-                                                   const QVariantList &allShortcuts)
-{
-    if (m_currentUser.isEmpty() || allShortcuts.isEmpty()) {
-        return QVariantMap();
-    }
-
-    // Build weighted pool based on learning levels
-    QVector<QPair<QVariantMap, int>> weightedPool;
-
-    for (const QVariant &shortcut : allShortcuts) {
-        QVariantMap shortcutMap = shortcut.toMap();
-        QString shortcutId = shortcutMap.value("title").toString();
-
-        // Get shortcut stats
-        QVariantMap stats = getShortcutStats(appId, categoryId, shortcutId);
-        int attemptCount = stats.value("attemptCount", 0).toInt();
-        int successCount = stats.value("successCount", 0).toInt();
-        QString level = stats.value("level", "new").toString();
-
-        // Assign weight based on learning level
-        int weight = 0;
-        if (level == "new" || attemptCount == 0) {
-            weight = 90;  // 90% weight for new shortcuts
-        } else if (level == "trained") {
-            weight = 50;  // 50% weight for trained shortcuts
-        } else if (level == "learned") {
-            weight = 10;  // 10% weight for learned shortcuts (for review)
-        }
-
-        weightedPool.append({shortcutMap, weight});
-    }
-
-    // Calculate total weight
-    int totalWeight = 0;
-    for (const auto &pair : weightedPool) {
-        totalWeight += pair.second;
-    }
-
-    if (totalWeight == 0) {
-        // If all weights are 0, return random
-        int randomIndex = QRandomGenerator::global()->bounded(allShortcuts.size());
-        return allShortcuts[randomIndex].toMap();
-    }
-
-    // Weighted random selection
-    int random = QRandomGenerator::global()->bounded(totalWeight);
-    int cumulative = 0;
-
-    for (const auto &pair : weightedPool) {
-        cumulative += pair.second;
-        if (random < cumulative) {
-            return pair.first;
-        }
-    }
-
-    // Fallback: return first shortcut
-    return allShortcuts.first().toMap();
-}
-
-void UserDataManager::updateShortcutLevel(const QString &appId,
-                                           const QString &categoryId,
-                                           const QString &shortcutId,
-                                           bool success)
-{
-    if (m_currentUser.isEmpty()) {
-        return;
-    }
-
-    // Get or create shortcut stats
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-    QVariantMap shortcutStats = appData.value("shortcutStats").toMap();
-    QVariantMap categoryStats = shortcutStats.value(categoryId).toMap();
-    QVariantMap stats = categoryStats.value(shortcutId).toMap();
-
-    // Update counts
-    int attemptCount = stats.value("attemptCount", 0).toInt() + 1;
-    int successCount = stats.value("successCount", 0).toInt() + (success ? 1 : 0);
-    int failureCount = stats.value("failureCount", 0).toInt() + (success ? 0 : 1);
-
-    stats["attemptCount"] = attemptCount;
-    stats["successCount"] = successCount;
-    stats["failureCount"] = failureCount;
-    stats["lastAttempt"] = QDateTime::currentDateTime().toString(Qt::ISODate);
-
-    // Determine learning level based on performance
-    QString level = "new";
-    if (attemptCount >= 5 && successCount >= 4) {
-        level = "learned";  // 80%+ success rate over 5+ attempts
-    } else if (attemptCount >= 2 && successCount >= 1) {
-        level = "trained";  // At least one success
-    }
-
-    stats["level"] = level;
-
-    // Save back
-    categoryStats[shortcutId] = stats;
-    shortcutStats[categoryId] = categoryStats;
-    appData["shortcutStats"] = shortcutStats;
-    appProgress[appId] = appData;
-    m_userData["appProgress"] = appProgress;
-
-    saveUserData();
-}
-
-QVariantMap UserDataManager::getShortcutStats(const QString &appId,
-                                              const QString &categoryId,
-                                              const QString &shortcutId)
-{
-    if (m_currentUser.isEmpty()) {
-        return QVariantMap();
-    }
-
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-    QVariantMap shortcutStats = appData.value("shortcutStats").toMap();
-    QVariantMap categoryStats = shortcutStats.value(categoryId).toMap();
-    QVariantMap stats = categoryStats.value(shortcutId).toMap();
-
-    // Return stats with defaults
-    if (stats.isEmpty()) {
-        stats["attemptCount"] = 0;
-        stats["successCount"] = 0;
-        stats["failureCount"] = 0;
-        stats["level"] = "new";
-        stats["lastAttempt"] = "";
-    }
-
-    return stats;
-}
-
-int UserDataManager::getUnlockedCount(const QString &appId, const QString &categoryId)
-{
-    if (m_currentUser.isEmpty()) {
-        return 0;
-    }
-
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-    QVariantMap shortcutStats = appData.value("shortcutStats").toMap();
-    QVariantMap categoryStats = shortcutStats.value(categoryId).toMap();
-
-    int unlockedCount = 0;
-    for (const QString &shortcutId : categoryStats.keys()) {
-        QVariantMap stats = categoryStats.value(shortcutId).toMap();
-        QString level = stats.value("level", "new").toString();
-
-        // Count trained and learned shortcuts
-        if (level == "trained" || level == "learned") {
-            unlockedCount++;
-        }
-    }
-
-    return unlockedCount;
-}
-
-int UserDataManager::getLearnedCount(const QString &appId, const QString &categoryId)
-{
-    if (m_currentUser.isEmpty()) {
-        return 0;
-    }
-
-    QVariantMap appProgress = m_userData.value("appProgress").toMap();
-    QVariantMap appData = appProgress.value(appId).toMap();
-    QVariantMap shortcutStats = appData.value("shortcutStats").toMap();
-    QVariantMap categoryStats = shortcutStats.value(categoryId).toMap();
-
-    int learnedCount = 0;
-    for (const QString &shortcutId : categoryStats.keys()) {
-        QVariantMap stats = categoryStats.value(shortcutId).toMap();
-        QString level = stats.value("level", "new").toString();
-
-        // Count only learned shortcuts (80%+ success rate)
-        if (level == "learned") {
-            learnedCount++;
-        }
-    }
-
-    return learnedCount;
-}
-
+// JSON conversion helpers
 QJsonObject UserDataManager::variantMapToJson(const QVariantMap &map)
 {
     QJsonObject obj;
-
-    for (auto it = map.begin(); it != map.end(); ++it) {
-        const QString &key = it.key();
-        const QVariant &value = it.value();
-
-        if (value.type() == QVariant::Map) {
-            obj[key] = variantMapToJson(value.toMap());
-        } else if (value.type() == QVariant::List) {
-            obj[key] = variantListToJson(value.toList());
+    for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
+        if (it.value().type() == QVariant::Map) {
+            obj[it.key()] = variantMapToJson(it.value().toMap());
+        } else if (it.value().type() == QVariant::List) {
+            obj[it.key()] = variantListToJson(it.value().toList());
         } else {
-            obj[key] = QJsonValue::fromVariant(value);
+            obj[it.key()] = QJsonValue::fromVariant(it.value());
         }
     }
-
     return obj;
 }
 
 QJsonArray UserDataManager::variantListToJson(const QVariantList &list)
 {
     QJsonArray arr;
-
-    for (const QVariant &value : list) {
-        if (value.type() == QVariant::Map) {
-            arr.append(variantMapToJson(value.toMap()));
-        } else if (value.type() == QVariant::List) {
-            arr.append(variantListToJson(value.toList()));
+    for (const QVariant &item : list) {
+        if (item.type() == QVariant::Map) {
+            arr.append(variantMapToJson(item.toMap()));
+        } else if (item.type() == QVariant::List) {
+            arr.append(variantListToJson(item.toList()));
         } else {
-            arr.append(QJsonValue::fromVariant(value));
+            arr.append(QJsonValue::fromVariant(item));
         }
     }
-
     return arr;
 }
 
 QVariantMap UserDataManager::jsonToVariantMap(const QJsonObject &json)
 {
-    return json.toVariantMap();
+    QVariantMap map;
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
+        if (it.value().isObject()) {
+            map[it.key()] = jsonToVariantMap(it.value().toObject());
+        } else if (it.value().isArray()) {
+            map[it.key()] = jsonToVariantList(it.value().toArray());
+        } else {
+            map[it.key()] = it.value().toVariant();
+        }
+    }
+    return map;
 }
 
 QVariantList UserDataManager::jsonToVariantList(const QJsonArray &array)
 {
-    return array.toVariantList();
+    QVariantList list;
+    for (const QJsonValue &value : array) {
+        if (value.isObject()) {
+            list.append(jsonToVariantMap(value.toObject()));
+        } else if (value.isArray()) {
+            list.append(jsonToVariantList(value.toArray()));
+        } else {
+            list.append(value.toVariant());
+        }
+    }
+    return list;
 }

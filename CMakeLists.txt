@@ -47,6 +47,10 @@ qt_add_qml_module(apppractice
         utils/LookupView.qml
         utils/CircularProgress.qml
         utils/ProgressDashboard.qml
+        utils/SummaryView.qml
+        utils/TeachMode.qml
+        utils/TestMode.qml
+        utils/TestResultsView.qml
     RESOURCES
         Resource.qrc
 )
